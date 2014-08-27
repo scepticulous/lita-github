@@ -1,0 +1,23 @@
+en:
+  lita:
+    handlers:
+      github:
+        status:
+          good: "GitHub is reporting that all systems are green!"
+          minor: "GitHub is reporting minor issues (status:yellow)! Last message:\n%{created_on} :: %{body}"
+          major: "GitHub is reporting major issues (status:red)! Last message:\n%{created_on} :: %{body}"
+      github_repo:
+        method_disabled: "Sorry, this function has been disabled in the config"
+        repo_create:
+          pass: "Created %{org}/%{repo}: %{repo_url}"
+          fail: "Unable to create %{org}/%{repo}"
+          exists: "Unable to create %{org}/%{repo} as it already exists"
+        repo_delete:
+          pass: "Deleted %{org}/%{repo}"
+          fail: "Unable to delete %{org}/%{repo}"
+        repo_info:
+          reply: "%{repo} (private:%{private}) :: %{url}\nDesc: %{description}\nIssues: %{issues_count} PRs: %{pr_count}"
+      github_pr:
+        repo_merge:
+          pass: "Merged pull request #%{pr} from %{org}/%{branch}\n%{title}"
+          fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}"

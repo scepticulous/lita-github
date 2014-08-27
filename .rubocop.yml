@@ -1,0 +1,14 @@
+FileName:
+  Exclude:
+    - Rakefile
+    - Gemfile
+    - lib/lita-github.rb
+    - lita-github.gemspec
+Metrics/ClassLength:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Metrics/LineLength:
+  Max: 120
+Metrics/MethodLength:
+  Max: 30
