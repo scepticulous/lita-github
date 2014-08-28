@@ -16,12 +16,8 @@
 
 require 'rspec'
 require 'lita/rspec'
-# require 'coveralls'
-# require 'simplecov'
+require 'codeclimate-test-reporter'
 
-# SimpleCov.formatter = Coveralls::SimpleCov::Formatter
-# SimpleCov.start do
-#   add_filter 'spec/'
-# end
+CodeClimate::TestReporter.start
 
 require 'lita-github'
