@@ -5,6 +5,7 @@ lita-github
 [![RubyGems :: lita-github Gem Version](http://img.shields.io/gem/v/lita-github.svg)](https://rubygems.org/gems/lita-github)
 [![Code Climate Quality](https://img.shields.io/codeclimate/github/PagerDuty/lita-github.svg)](https://codeclimate.com/github/PagerDuty/lita-github)
 [![Code Climate Coverage](http://img.shields.io/codeclimate/coverage/github/PagerDuty/lita-github.svg)](https://codeclimate.com/github/PagerDuty/lita-github)
+
 Copyright 2014 PagerDuty, Inc.
 
 Lita handler for GitHub-related operations. This include administrative management of organizations and repository management/operations.
