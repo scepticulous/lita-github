@@ -40,8 +40,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 0.25.0'
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'fuubar', '~> 2.0'
-  s.add_development_dependency 'coveralls', '~> 0.7'
-  s.add_development_dependency 'simplecov', '~> 0.9'
+  s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4', '>= 0.4.0'
 
   s.add_runtime_dependency 'lita', '~> 3.3'
   s.add_runtime_dependency 'octokit', '~> 3.3'
