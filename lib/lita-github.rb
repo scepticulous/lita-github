@@ -23,3 +23,4 @@ Lita.load_locales Dir[File.expand_path(
 require 'lita-github/version'
 require 'lita/handlers/github'
 require 'lita/handlers/github_repo'
+require 'lita/handlers/github_pr'
