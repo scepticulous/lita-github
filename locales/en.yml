@@ -15,6 +15,7 @@ en:
         repo_delete:
           pass: "Deleted %{org}/%{repo}"
           fail: "Unable to delete %{org}/%{repo}"
+          not_found: "That repo (%{org}/%{repo}) does not exist"
         repo_info:
           reply: "%{repo} (private:%{private}) :: %{url}\nDesc: %{description}\nIssues: %{issues_count} PRs: %{pr_count}"
       github_pr:

@@ -14,12 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'lita'
-
-Lita.load_locales Dir[File.expand_path(
-  File.join('..', '..', 'locales', '*.yml'), __FILE__
-)]
-
-require 'lita-github/version'
-require 'lita/handlers/github'
-require 'lita/handlers/github_repo'
+module LitaGithub
+  # Github handler common-use method filters
+  module Filters
+    def func_disabled?(method)
+      config.send("#{method}_enabled".to_sym) ? false : true
+    end
+  end
+end

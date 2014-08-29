@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'lita'
+module LitaGithub
+  # Github handler common-use Repository methods
+  module Repo
+    def rpo(org, repo)
+      "#{org}/#{repo}"
+    end
 
-Lita.load_locales Dir[File.expand_path(
-  File.join('..', '..', 'locales', '*.yml'), __FILE__
-)]
-
-require 'lita-github/version'
-require 'lita/handlers/github'
-require 'lita/handlers/github_repo'
+    def repo?(r)
+      octo.repository?(r)
+    end
+  end
+end
