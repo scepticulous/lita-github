@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'octokit'
 require 'lita-github/version'
 require 'lita-github/r'
 require 'lita-github/config'
