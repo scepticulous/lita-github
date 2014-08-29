@@ -46,25 +46,41 @@ describe LitaGithub::R do
 
     context 'it should match' do
       it 'test:pass' do
-        expect(subject.match(' test:pass')).to_not be_nil
+        s = ' test:pass'
+        m = s.scan(subject).flatten.compact
+        expect(m).to eql [' test:pass']
       end
 
       it 'test7_pass:pAss_test' do
-        expect(subject.match(' test7_pass:pAss_test')).to_not be_nil
+        s = ' test7_pass:pAss_test'
+        m = s.scan(subject).flatten.compact
+        expect(m).to eql [' test7_pass:pAss_test']
+      end
+
+      it 'test:pass bacon:always test:coverage' do
+        s = ' test:pass bacon:always test:coverage'
+        m = s.scan(subject).flatten.compact
+        expect(m).to eql [' test:pass', ' bacon:always', ' test:coverage']
       end
     end
 
     context 'it should not match' do
       it 'test-stuff:fail' do
-        expect(subject.match(' test-stuff:fail')).to be_nil
+        s = ' test-stuff:fail'
+        m = s.scan(subject).flatten.compact
+        expect(m).to be_empty
       end
 
       it 'test: fail' do
-        expect(subject.match(' test: fail')).to be_nil
+        s = ' test: fail'
+        m = s.scan(subject).flatten.compact
+        expect(m).to be_empty
       end
 
-      it 'test:fail' do
-        expect(subject.match('test:fail')).to be_nil
+      it 'test:fail (no leading space)' do
+        s = 'test:fail'
+        m = s.scan(subject).flatten.compact
+        expect(m).to be_empty
       end
     end
   end

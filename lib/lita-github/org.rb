@@ -14,12 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'lita'
-
-Lita.load_locales Dir[File.expand_path(
-  File.join('..', '..', 'locales', '*.yml'), __FILE__
-)]
-
-require 'lita-github/version'
-require 'lita/handlers/github'
-require 'lita/handlers/github_repo'
+module LitaGithub
+  # Github handler common-use Organization methods
+  module Org
+    def organization(name)
+      name.nil? || name.empty? ? config.default_org : name
+    end
+  end
+end

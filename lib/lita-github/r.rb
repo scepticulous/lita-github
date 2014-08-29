@@ -22,9 +22,9 @@ module LitaGithub
 
     # option regex, letting you scan the command string of things like:
     # key1:value key2:value, etc.
-    OPT_REGEX ||= /((?:\s+?[a-zA-Z0-9_]+?):(?:[a-zA-Z0-9_]+))(?:\s+?)?/
+    OPT_REGEX ||= /((?:\s+?[a-zA-Z0-9_]+?):(?:[a-zA-Z0-9_]+))/
 
     # regex matcher for: Org/repo
-    REPO_REGEX = '(?:(?<org>\w+)(?:\s+?)?\/)?(?:\s+?)?(?<repo>\w+)'
+    REPO_REGEX = '(?:(?<org>[a-zA-Z0-9_\-]+)(?:\s+?)?\/)?(?:\s+?)?(?<repo>[a-zA-Z0-9_\-]+)'
   end
 end
