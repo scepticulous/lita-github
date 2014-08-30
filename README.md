@@ -25,9 +25,9 @@ The configuration options will get their own in-depth doc a little further down 
 * `config.handlers.github.access_token = ''`
   * Your GitHUb access token (generated from Settings > Security > Personal Applications)
   * This is an administrative utility, so the token will need pretty wide access to leverage this plugin fully
-* `config.handlers.default_org = ''`
+* `config.handlers.github.default_org = ''`
   * Your company may only have one organization, the handler will allow you to type just the repo name (`lita-github`) instead of `PagerDuty/lita-github`.
-* `config.handlers.default_team_slug = ''`
+* `config.handlers.github.default_team_slug = ''`
   * the default team that should be added to a repo based on the slug name:
     * When clicking on a team in your org you can use the URL to get the slug: https://github.com/orgs/<ORG>/teams/[slug]
 
@@ -41,7 +41,22 @@ The command support two prefixes, assuming you have the `robot_alias` set to `!`
 
 Here is the current functionality:
 
+### GitHub Main Handler
+
 * `!gh status`
   * get the current system status for GitHub
 * `!gh version`
   * get the version of handler
+
+### GitHub Repository Handler
+* `!gh repo create PagerDuty/lita-github private:true team:<team_slug>`
+  * This creates a new repository, sets it to private, and adds the team you've specified.
+  * This method can be disabled by setting `config.handlers.github.repo_create_enabled = false` in your configuration file
+* `!gh repo delete PagerDuty/lita-github`
+  * Deletes the repo you specify, requires confirmation before doing so
+  * **Note:** This method is disabled by default, you need to enable it by setting `config.handlers.github.repo_delete_enabled = true` in your configuration file
+
+### Github PR Handler
+* `!gh pr merge #42 PagerDuty/lita-github` or `!shipit #42 PagerDuty/lita-github`
+  * This merges the specified pull request
+  * This method can be disabled by setting `config.handlers.github.pr_merge_enabled = false` in your configuration file
