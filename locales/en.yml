@@ -21,7 +21,7 @@ en:
       github_pr:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
-        not_found: "Pull request #%{pr} on %{org}/${repo} not found"
+        not_found: "Pull request #%{pr} on %{org}/%{repo} not found"
         pr_merge:
           pass: "Merged pull request #%{pr} from %{org}/%{branch}\n%{title}"
           fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}\nMessage: %{msg}"
