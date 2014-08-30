@@ -20,15 +20,45 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     end
   end
 
+  describe '.merge_pr' do
+    before do
+      @merge_status = { sha: 'abc456', merged: true, message: 'Pull Request successfully merged' }
+      @octo_obj = double('Octokit::Client', merge_pull_request: @merge_status)
+      allow(github_pr).to receive(:octo).and_return(@octo_obj)
+    end
+
+    context 'when all goes well' do
+      it 'should return the response from trying to merge' do
+        expect(github_pr.send(:merge_pr, github_org, github_repo, '42', 'test commit'))
+          .to eql @merge_status
+      end
+    end
+
+    context 'when we hit an exception' do
+      before do
+        @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
+        @octo_obj = double('Octokit::Client')
+        allow(@octo_obj).to receive(:merge_pull_request).and_raise(StandardError.new)
+        allow(github_pr).to receive(:octo).and_return(@octo_obj)
+      end
+
+      it 'should return nil' do
+        expect(github_pr.send(:merge_pr, github_org, github_repo, 42, 'test commit'))
+          .to be_nil
+      end
+    end
+  end
+
   describe '.pr_merge' do
     before do
       @cfg_obj = double('Lita::Configuration', pr_merge_enabled: true)
       @pr_obj =  { head: { ref: 'fix-some-bugs' }, title: 'fix bug' }
       @merge_status = { sha: 'abc456', merged: true, message: 'Pull Request successfully merged' }
-      @octo_obj = double('Octokit::Client', pull_request: @pr_obj, merge_pull_request: @merge_status)
+      @octo_obj = double('Octokit::Client', pull_request: @pr_obj)
       allow(github_pr).to receive(:octo).and_return(@octo_obj)
       allow(github_pr).to receive(:func_disabled?).and_return(false)
       allow(github_pr).to receive(:config).and_return(@cfg_obj)
+      allow(github_pr).to receive(:merge_pr).and_return(@merge_status)
     end
 
     context 'when command disabled' do
@@ -44,8 +74,8 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
 
     context 'when merging should succeed' do
       it 'should set the right commit message' do
-        expect(@octo_obj).to receive(:merge_pull_request).with(
-          'GrapeDuty/lita-test', '42', "Merge pull request #42 from GrapeDuty/fix-some-bugs\n\nfix bug"
+        expect(github_pr).to receive(:merge_pr).with(
+          'GrapeDuty', 'lita-test', '42', "Merge pull request #42 from GrapeDuty/fix-some-bugs\n\nfix bug"
         )
         send_command('shipit #42 GrapeDuty/lita-test')
       end
@@ -60,8 +90,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     context 'when merging bombs' do
       before do
         @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
-        @octo_obj = double('Octokit::Client', pull_request: @pr_obj, merge_pull_request: @merge_status)
-        allow(github_pr).to receive(:octo).and_return(@octo_obj)
+        allow(github_pr).to receive(:merge_pr).and_return(@merge_status)
       end
 
       it 'should confirm the failure' do
@@ -78,8 +107,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       before do
         @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
         @octo_obj = double('Octokit::Client', pull_request: @pr_obj)
-        allow(@octo_obj).to receive(:merge_pull_request).and_raise(StandardError.new)
-        allow(github_pr).to receive(:octo).and_return(@octo_obj)
+        allow(github_pr).to receive(:merge_pr).and_return(nil)
       end
 
       it 'should confirm the failure' do

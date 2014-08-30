@@ -48,19 +48,18 @@ module Lita
       def pr_merge(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
         org, repo, pr = pr_match(response)
-        pr_obj = octo.pull_request(rpo(org, repo), pr)
+
+        begin
+          pr_obj = octo.pull_request(rpo(org, repo), pr)
+        rescue Octokit::NotFound
+          return response.reply(t('not_found', pr: pr, org: org, repo: repo))
+        end
 
         branch = pr_obj[:head][:ref]
         title = pr_obj[:title]
         commit = "Merge pull request ##{pr} from #{org}/#{branch}\n\n#{title}"
 
-        # rubocop:disable Lint/HandleExceptions
-        begin
-          status = octo.merge_pull_request(rpo(org, repo), pr, commit)
-        rescue StandardError
-          # no-op
-        end
-        # rubocop:enable Lint/HandleExceptions
+        status = merge_pr(org, repo, pr, commit)
 
         if !defined?(status) || status.nil?
           response.reply(t('exception'))
@@ -77,6 +76,18 @@ module Lita
       def pr_match(response)
         md = response.match_data
         [organization(md['org']), md['repo'], md['pr']]
+      end
+
+      def merge_pr(org, repo, pr, commit)
+        status = nil
+        # rubocop:disable Lint/HandleExceptions
+        begin
+          status = octo.merge_pull_request(rpo(org, repo), pr, commit)
+        rescue StandardError
+          # no-op
+        end
+        # rubocop:enable Lint/HandleExceptions
+        status
       end
     end
 
