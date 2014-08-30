@@ -64,6 +64,8 @@ module Lita
       )
 
       def repo_create(response)
+        return response.reply(t('method_disabled')) if func_disabled?(__method__)
+
         org, repo = repo_match(response)
 
         if repo?(rpo(org, repo))
