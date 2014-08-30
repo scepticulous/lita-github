@@ -89,9 +89,10 @@ module Lita
 
       def repo_info(response)
         org, repo = repo_match(response)
+        full_name = rpo(org, repo)
         opts = {}
-        r_obj = octo.repository(rpo(org, repo))
-        p_obj = octo.pull_requests(rpo(org, repo))
+        r_obj = octo.repository(full_name)
+        p_obj = octo.pull_requests(full_name)
 
         opts[:repo]             = r_obj[:full_name]
         opts[:description]      = r_obj[:description]
@@ -159,12 +160,13 @@ module Lita
       end
 
       def create_repo(org, repo, opts)
+        full_name = rpo(org, repo)
         reply = nil
         begin
           octo.create_repository(repo, opts)
         ensure
-          if repo?(rpo(org, repo))
-            repo_url = "https://github.com/#{rpo(org, repo)}"
+          if repo?(full_name)
+            repo_url = "https://github.com/#{full_name}"
             reply = t('repo_create.pass', org: org, repo: repo, repo_url: repo_url)
           else
             reply = t('repo_create.fail', org: org, repo: repo)
@@ -174,11 +176,12 @@ module Lita
       end
 
       def delete_repo(org, repo)
+        full_name = rpo(org, repo)
         reply = nil
         begin
-          octo.delete_repository(rpo(org, repo))
+          octo.delete_repository(full_name)
         ensure
-          if repo?(rpo(org, repo))
+          if repo?(full_name)
             reply = t('repo_delete.fail', org: org, repo: repo)
           else
             reply = t('repo_delete.pass', org: org, repo: repo)
