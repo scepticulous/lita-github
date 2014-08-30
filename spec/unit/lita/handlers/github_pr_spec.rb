@@ -72,6 +72,17 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
     end
 
+    context 'when repo not found' do
+      before do
+        allow(@octo_obj).to receive(:pull_request).and_raise(Octokit::NotFound.new)
+      end
+
+      it 'should reply indicating it was invalid' do
+        send_command("shipit #42 #{github_org}/#{github_repo}")
+        expect(replies.last).to eql 'Pull request #42 on GrapeDuty/lita-test not found'
+      end
+    end
+
     context 'when merging should succeed' do
       it 'should set the right commit message' do
         expect(github_pr).to receive(:merge_pr).with(
