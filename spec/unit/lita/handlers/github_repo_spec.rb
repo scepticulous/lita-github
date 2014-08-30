@@ -34,7 +34,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   let(:github_repo) { Lita::Handlers::GithubRepo.new('robot') }
   let(:github_org) { 'GrapeDuty' }
-  let(:disabled_reply) { 'Sorry, this function has been disabled in the config' }
+  let(:disabled_reply) { 'Sorry, this function has either been disabled or not enabled in the config' }
 
   ####
   # Helper Methods

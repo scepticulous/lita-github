@@ -10,7 +10,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
   let(:github_pr) { Lita::Handlers::GithubPR.new('robot') }
   let(:github_org) { 'GrapeDuty' }
   let(:github_repo) { 'lita-test' }
-  let(:disabled_reply) { 'Sorry, this function has been disabled in the config' }
+  let(:disabled_reply) { 'Sorry, this function has either been disabled or not enabled in the config' }
 
   describe '.pr_match' do
     it 'should return the content of the match data' do
