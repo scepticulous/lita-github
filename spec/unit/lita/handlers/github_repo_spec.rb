@@ -295,9 +295,21 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   describe '.repo_create' do
     before do
       @opts = { private: true, team_id: 42, organization: github_org }
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
       allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
       allow(github_repo).to receive(:extrapolate_create_opts).and_return(@opts)
       allow(github_repo).to receive(:create_repo).and_return('hello from PAX prime!')
+    end
+
+    context 'when command disabled' do
+      before do
+        allow(github_repo).to receive(:func_disabled?).and_return(true)
+      end
+
+      it 'should no-op and say such if the command is disabled' do
+        send_command("gh repo create #{github_org}/lita-test")
+        expect(replies.last).to eql disabled_reply
+      end
     end
 
     context 'when repo already exists' do

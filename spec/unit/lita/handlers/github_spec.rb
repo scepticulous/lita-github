@@ -24,12 +24,20 @@ describe Lita::Handlers::Github, lita_handler: true do
   it { routes_command('gh version').to(:gh_version) }
 
   describe '#default_config' do
-    it 'should disable repo_delete by default' do
+    it 'should set repos to private by default' do
+      expect(Lita.config.handlers.github.repo_private_default).to be_truthy
+    end
+
+    it 'should enable Lita::Handlers::GithubRepo.repo_create by default' do
+      expect(Lita.config.handlers.github.repo_create_enabled).to be_truthy
+    end
+
+    it 'should disable Lita::Handlers::GithubRepo.repo_delete by default' do
       expect(Lita.config.handlers.github.repo_delete_enabled).to be_falsey
     end
 
-    it 'should set repos to private by default' do
-      expect(Lita.config.handlers.github.repo_private_default).to be_truthy
+    it 'should enable Lita::Handlers::GithubPR.pr_merge by default' do
+      expect(Lita.config.handlers.github.pr_merge_enabled).to be_truthy
     end
   end
 

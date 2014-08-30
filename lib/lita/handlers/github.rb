@@ -51,7 +51,16 @@ module Lita
         # when setting default configuration values please remember one thing:
         # secure and safe by default
         config.repo_private_default = true
+
+        ####
+        # Method Filters
+        ####
+
+        # Lita::Handlers::GithubRepo
+        config.repo_create_enabled = true
         config.repo_delete_enabled = false
+
+        # Lita::Handlers::GithubPR
         config.pr_merge_enabled = true
       end
 
