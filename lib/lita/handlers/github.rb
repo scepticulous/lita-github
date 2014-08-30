@@ -50,8 +50,9 @@ module Lita
       def self.default_config(config)
         # when setting default configuration values please remember one thing:
         # secure and safe by default
-        config.repo_delete_enabled = false
         config.repo_private_default = true
+        config.repo_delete_enabled = false
+        config.pr_merge_enabled = true
       end
 
       def gh_status(response)

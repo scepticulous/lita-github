@@ -7,7 +7,7 @@ en:
           minor: "GitHub is reporting minor issues (status:yellow)! Last message:\n%{created_on} :: %{body}"
           major: "GitHub is reporting major issues (status:red)! Last message:\n%{created_on} :: %{body}"
       github_repo:
-        method_disabled: "Sorry, this function has been disabled in the config"
+        method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         repo_create:
           pass: "Created %{org}/%{repo}: %{repo_url}"
           fail: "Unable to create %{org}/%{repo}"
@@ -19,6 +19,9 @@ en:
         repo_info:
           reply: "%{repo} (private:%{private}) :: %{url}\nDesc: %{description}\nIssues: %{issues_count} PRs: %{pr_count}"
       github_pr:
-        repo_merge:
+        method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
+        exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
+        not_found: "Pull request #%{pr} on %{org}/${repo} not found"
+        pr_merge:
           pass: "Merged pull request #%{pr} from %{org}/%{branch}\n%{title}"
-          fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}"
+          fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}\nMessage: %{msg}"
