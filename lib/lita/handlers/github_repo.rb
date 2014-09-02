@@ -117,6 +117,7 @@ module Lita
         o
       end
 
+      # TODO: convert this to a mixin method for reuse
       def repo_match(response)
         md = response.match_data
         [organization(md['org']), md['repo']]

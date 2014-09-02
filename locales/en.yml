@@ -22,6 +22,13 @@ en:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
         not_found: "Pull request #%{pr} on %{org}/%{repo} not found"
+        pr_info:
+          header: "%{repo} #%{number}: %{title} :: %{url}\n"
+          status: "Opened By: %{user} | State: %{state_str} | Build: %{build_status}"
+          merged: " | Merged By: %{merged_by}\n"
+          mergeable: " | Mergeable: %{mergeable}\n"
+          commit_info: "Head: %{pr_sha_short} | Commits: %{commits} (+%{plus}/-%{minus}) :: %{compare}\n"
+          comments: "PR Comments: %{comments} | Code Comments: %{review_comments}\n"
         pr_merge:
           pass: "Merged pull request #%{pr} from %{org}/%{branch}\n%{title}"
           fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}\nMessage: %{msg}"
