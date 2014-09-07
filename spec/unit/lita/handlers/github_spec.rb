@@ -25,6 +25,10 @@ describe Lita::Handlers::Github, lita_handler: true do
   it { routes_command('gh token').to(:token_generate) }
 
   describe '#default_config' do
+    it 'should set default team to nil' do
+      expect(Lita.config.handlers.github.default_team_slug).to be_nil
+    end
+
     it 'should set repos to private by default' do
       expect(Lita.config.handlers.github.repo_private_default).to be_truthy
     end

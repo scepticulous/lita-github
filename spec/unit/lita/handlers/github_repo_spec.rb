@@ -84,7 +84,37 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
-  describe '.team_by_slug' do
+  describe '.default_team' do
+    before do
+      allow(github_repo).to receive(:team_id_by_slug).and_return(88)
+    end
+
+    context 'when the default team slug is set' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slug: 'heckman')
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return the team ID of the slug' do
+        expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
+          .and_return(42)
+        expect(github_repo.send(:default_team, github_org)).to eql 42
+      end
+    end
+
+    context 'when the default slug is not set' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slug: nil)
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return nil' do
+        expect(github_repo.send(:default_team, github_org)).to be_nil
+      end
+    end
+  end
+
+  describe '.team_id_by_slug' do
     before do
       @teams = [
         { id: 1, slug: 'hi' },
@@ -97,13 +127,13 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     it 'should return the team id of the team matching the slug' do
       expect(@octo_obj).to receive(:organization_teams).with(github_org).and_return(@teams)
-      expect(github_repo.send(:team_by_slug, 'heckman', github_org)).to eql 42
-      expect(github_repo.send(:team_by_slug, 'orwell', github_org)).to eql 84
-      expect(github_repo.send(:team_by_slug, 'unknown', github_org)).to be_nil
+      expect(github_repo.send(:team_id_by_slug, 'heckman', github_org)).to eql 42
+      expect(github_repo.send(:team_id_by_slug, 'orwell', github_org)).to eql 84
+      expect(github_repo.send(:team_id_by_slug, 'unknown', github_org)).to be_nil
     end
 
     it 'should return nil if unknown' do
-      expect(github_repo.send(:team_by_slug, 'unknown', 'x')).to be_nil
+      expect(github_repo.send(:team_id_by_slug, 'unknown', 'x')).to be_nil
     end
   end
 
@@ -112,12 +142,35 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       @eco_opts = {}
       @c_obj = double('Lita::Configuration', default_team_slug: 'h3ckman')
       allow(github_repo).to receive(:config).and_return(@c_obj)
-      allow(github_repo).to receive(:team_by_slug).and_return(42)
+      allow(github_repo).to receive(:team_id_by_slug).and_return(42)
     end
 
     it 'should set the :organization key and :team_id key' do
       h = { organization: github_org, team_id: 42 }
       expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+    end
+
+    context 'when there is no :team set' do
+      context 'when default_team returns a team id' do
+        it 'should get the default team_id' do
+          h = { organization: github_org, team_id: 44 }
+          expect(github_repo).to receive(:default_team).with(github_org).and_return(44)
+          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+        end
+      end
+
+      context 'when default_team returns nil' do
+        before do
+          @c_obj = double('Lita::Configuration', default_team_slug: nil)
+          allow(github_repo).to receive(:config).and_return(@c_obj)
+        end
+
+        it 'should not set the :team_id key' do
+          h = { organization: github_org }
+          expect(github_repo).to receive(:default_team).with(github_org).and_return(nil)
+          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+        end
+      end
     end
 
     context 'when options contains :team and no :team_id' do
@@ -126,16 +179,34 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
         it 'should set the :team_id key' do
           h = { organization: github_org, team_id: 84 }.merge!(@eco_opts)
-          expect(github_repo).to receive(:team_by_slug).with('heckman', github_org).and_return(84)
+          expect(github_repo).to receive(:team_id_by_slug).with('heckman', github_org).and_return(84)
           expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
         end
       end
 
       context 'when given an invalid slug' do
-        it 'should set the team to the default' do
-          h = { organization: github_org, team_id: 42 }.merge!(@eco_opts)
-          expect(github_repo).to receive(:team_by_slug).with('h3ckman', github_org).and_return(42)
-          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+        context 'when there is a default slug set' do
+          it 'should set the team to the default' do
+            h = { organization: github_org, team_id: 42 }.merge!(@eco_opts)
+            expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org).and_return(42)
+            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+          end
+        end
+
+        context 'when there is no default slug set' do
+          before do
+            @eco_opts = { team: 'h3ckman' }
+            c_obj = double('Lita::Configuration', default_team_slug: nil)
+            allow(github_repo).to receive(:config).and_return(c_obj)
+          end
+
+          it 'should not set a :team_id' do
+            h = { organization: github_org }.merge!(@eco_opts)
+            expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org)
+              .and_return(nil)
+            expect(github_repo).to receive(:default_team).with(github_org).and_call_original
+            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+          end
         end
       end
     end
@@ -145,7 +216,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
       it 'should just leave it alone...' do
         h = { organization: github_org }.merge!(@eco_opts)
-        expect(github_repo).not_to receive(:team_by_slug)
+        expect(github_repo).not_to receive(:team_id_by_slug)
         expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
       end
     end

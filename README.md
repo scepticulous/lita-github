@@ -27,6 +27,7 @@ The configuration options will get their own in-depth doc a little further down 
 * `config.handlers.github.default_org = ''`
   * Your company may only have one organization, the handler will allow you to type just the repo name (`lita-github`) instead of `PagerDuty/lita-github`.
 * `config.handlers.github.default_team_slug = ''`
+  * if no team is provided when adding a repo, it uses this team by default -- if unset, only owners can access repo
   * the default team that should be added to a repo based on the slug name:
     * When clicking on a team in your org you can use the URL to get the slug: https://github.com/orgs/<ORG>/teams/[slug]
 
