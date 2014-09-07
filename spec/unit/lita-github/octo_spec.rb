@@ -16,6 +16,7 @@
 
 require 'spec_helper'
 
+# Dummy class for mocking Octokit::Client
 class DoubleFixer
   class << self
     attr_accessor :auto_paginate
@@ -37,7 +38,6 @@ describe LitaGithub::Octo do
     @dummy = DummyClass.new
     @dummy.setup_octo(nil)
   end
-  after(:all) { allow(Octokit::Client).to receive(:new).and_call_original }
 
   include LitaGithub::Octo
 

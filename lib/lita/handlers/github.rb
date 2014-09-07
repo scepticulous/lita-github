@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'rotp'
 require 'lita-github/version'
 require 'lita-github/r'
 require 'lita-github/config'
@@ -47,6 +48,14 @@ module Lita
         }
       )
 
+      route(
+        /#{LitaGithub::R::A_REG}(?:token|2fa|tfa)/, :token_generate,
+        command: true,
+        help: {
+          'gh token' => 'generate a Time-based One-Time Password (TOTP) using provided secret'
+        }
+      )
+
       def self.default_config(config)
         # when setting default configuration values please remember one thing:
         # secure and safe by default
@@ -55,6 +64,9 @@ module Lita
         ####
         # Method Filters
         ####
+
+        # Lita::Handlers::Github
+        config.totp_secret = nil
 
         # Lita::Handlers::GithubRepo
         config.repo_create_enabled = true
@@ -67,6 +79,14 @@ module Lita
       def gh_status(response)
         status = octo.github_status_last_message
         response.reply(t("status.#{status[:status]}", status))
+      end
+
+      def token_generate(response)
+        if config.totp_secret.is_a?(String)
+          response.reply(t('token_generate.totp', token: ROTP::TOTP.new(config.totp_secret).now))
+        else
+          response.reply(t('token_generate.no_secret'))
+        end
       end
 
       def gh_version(response)

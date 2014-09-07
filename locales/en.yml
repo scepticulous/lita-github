@@ -6,6 +6,9 @@ en:
           good: "GitHub is reporting that all systems are green!"
           minor: "GitHub is reporting minor issues (status:yellow)! Last message:\n%{created_on} :: %{body}"
           major: "GitHub is reporting major issues (status:red)! Last message:\n%{created_on} :: %{body}"
+        token_generate:
+          no_secret: "'totp_secret' has not been provided in the config, unable to generate TOTP"
+          totp: "%{token}"
       github_repo:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         repo_create:
