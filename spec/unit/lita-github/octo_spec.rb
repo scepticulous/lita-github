@@ -16,20 +16,28 @@
 
 require 'spec_helper'
 
+class DoubleFixer
+  class << self
+    attr_accessor :auto_paginate
+  end
+end
+
 # Dummy class for testing some mixin
 class DummyClass
   include LitaGithub::Octo
+  extend LitaGithub::Octo
 end
 
 describe LitaGithub::Octo do
   before do
-    allow(Octokit::Client).to receive(:new).with(access_token: 'abc123').and_return(:ohai)
+    allow(Octokit::Client).to receive(:new).with(access_token: 'abc123').and_return(DoubleFixer)
     @conf_obj = double('Lita::Config', access_token: 'abc123')
     allow(self).to receive(:config).and_return(@conf_obj)
     allow_any_instance_of(DummyClass).to receive(:config).and_return(@conf_obj)
     @dummy = DummyClass.new
     @dummy.setup_octo(nil)
   end
+  after(:all) { allow(Octokit::Client).to receive(:new).and_call_original }
 
   include LitaGithub::Octo
 
@@ -41,13 +49,19 @@ describe LitaGithub::Octo do
 
   describe '.setup_octo' do
     it 'should set up the Octokit client instance' do
-      expect(DummyClass.class_variable_get(:@@octo)).to eql :ohai
+      x = DummyClass.class_variable_get(:@@octo)
+      expect(x).to eql DoubleFixer
+    end
+
+    it 'should turn on auto pagination' do
+      expect(DoubleFixer).to receive(:auto_paginate=).with(true)
+      DummyClass.setup_octo(nil)
     end
   end
 
   describe '.octo' do
     it 'should return the @@octo instance variable' do
-      expect(@dummy.octo).to eql :ohai
+      expect(@dummy.octo).to eql DoubleFixer
     end
   end
 end

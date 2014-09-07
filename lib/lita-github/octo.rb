@@ -27,6 +27,7 @@ module LitaGithub
     # set up the Octokit client
     def setup_octo(_)
       @@octo ||= Octokit::Client.new(access_token: access_token)
+      @@octo.auto_paginate = true
     end
 
     # object access method for Octokit client
