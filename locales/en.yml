@@ -32,3 +32,6 @@ en:
         pr_merge:
           pass: "Merged pull request #%{pr} from %{org}/%{branch}\n%{title}"
           fail: "Failed trying to merge PR #%{pr} (%{title}) :: %{url}\nMessage: %{msg}"
+        pr_list:
+          large_list: "You have more than %{max} open pull requests :(! Here are the ten newest oldest:\n"
+          no_prs: "This repo has no open pull requests; good job!"

@@ -17,12 +17,19 @@
 module LitaGithub
   # Github handler common-use Repository methods
   module Repo
+    PR_LIST_MAX_COUNT = 20
+
     def rpo(org, repo)
       "#{org}/#{repo}"
     end
 
     def repo?(r)
       octo.repository?(r)
+    end
+
+    def repo_match(response)
+      md = response.match_data
+      [organization(md['org']), md['repo']]
     end
   end
 end
