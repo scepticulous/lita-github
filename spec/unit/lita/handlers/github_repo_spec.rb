@@ -151,17 +151,6 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
-  describe '.repo_match' do
-    let(:resp_obj) do
-      md_mock = { 'org' => github_org, 'repo' => 'lita-test' }
-      double('Lita::Response', match_data: md_mock)
-    end
-
-    it 'should return the Org/Repo match' do
-      expect(github_repo.send(:repo_match, resp_obj)).to eql [github_org, 'lita-test']
-    end
-  end
-
   describe '.command_opts' do
     it 'should find the valid options' do
       o = ' private:true team:heckman bacon:always bacon:sometimes'

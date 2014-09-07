@@ -52,6 +52,14 @@ module Lita
         }
       )
 
+      route(
+        /#{LitaGithub::R::A_REG}pr\s+?list\s+?#{LitaGithub::R::REPO_REGEX}/, :pr_list,
+        command: true,
+        help: {
+          'gh pr list PagerDuty/lita-github' => 'list the 10 oldest and newest PRs'
+        }
+      )
+
       # rubocop:disable Metrics/CyclomaticComplexity
       # rubocop:disable Metrics/PerceivedComplexity
       def pr_info(response)
@@ -97,6 +105,30 @@ module Lita
       end
       # rubocop:enable Metrics/CyclomaticComplexity
       # rubocop:enable Metrics/PerceivedComplexity
+
+      def pr_list(response)
+        org, repo = repo_match(response)
+        full_name = rpo(org, repo)
+        reply = ''
+
+        prs = octo.pull_requests(full_name)
+
+        if prs.length > LitaGithub::Repo::PR_LIST_MAX_COUNT
+          reply = t('pr_list.large_list', max: LitaGithub::Repo::PR_LIST_MAX_COUNT)
+
+          prs.slice(0, 10).each { |pr| reply << list_line(pr, full_name) }
+
+          reply << "----\n"
+
+          prs.slice(-10, 10).each { |pr| reply << list_line(pr, full_name) }
+        elsif prs.length > 0
+          prs.each { |pr| reply << list_line(pr, full_name) }
+        else
+          reply = t('pr_list.no_prs')
+        end
+
+        response.reply(reply)
+      end
 
       private
 
@@ -182,6 +214,10 @@ module Lita
         info[:review_comments]  = pr_obj[:review_comments]
         info[:comments]         = pr_obj[:comments]
         info
+      end
+
+      def list_line(pr, full_name)
+        t('pr_info.header', build_pr_header!({}, pr).merge(repo: full_name))
       end
     end
 
