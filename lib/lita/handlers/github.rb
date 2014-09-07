@@ -32,7 +32,7 @@ module Lita
       on :loaded, :setup_octo # from LitaGithub::Octo
 
       route(
-        /#{LitaGithub::R::A_REG}status/, :gh_status,
+        /#{LitaGithub::R::A_REG}status/, :status,
         command: true,
         help: {
           'github status' => 'get the system status from GitHub',
@@ -41,7 +41,7 @@ module Lita
       )
 
       route(
-        /#{LitaGithub::R::A_REG}(?:v|version|build)/, :gh_version,
+        /#{LitaGithub::R::A_REG}(?:v|version|build)/, :version,
         command: true,
         help: {
           'gh version' => 'get the lita-github version'
@@ -76,9 +76,13 @@ module Lita
         config.pr_merge_enabled = true
       end
 
-      def gh_status(response)
+      def status(response)
         status = octo.github_status_last_message
         response.reply(t("status.#{status[:status]}", status))
+      end
+
+      def version(response)
+        response.reply("lita-github v#{LitaGithub::VERSION}")
       end
 
       def token_generate(response)
@@ -87,10 +91,6 @@ module Lita
         else
           response.reply(t('token_generate.no_secret'))
         end
-      end
-
-      def gh_version(response)
-        response.reply("lita-github v#{LitaGithub::VERSION}")
       end
     end
 

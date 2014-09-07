@@ -19,9 +19,9 @@ require 'spec_helper'
 describe Lita::Handlers::Github, lita_handler: true do
   let(:github) { Lita::Handlers::Github.new('robot') }
 
-  it { routes_command('gh status').to(:gh_status) }
-  it { routes_command('github status').to(:gh_status) }
-  it { routes_command('gh version').to(:gh_version) }
+  it { routes_command('gh status').to(:status) }
+  it { routes_command('github status').to(:status) }
+  it { routes_command('gh version').to(:version) }
   it { routes_command('gh token').to(:token_generate) }
 
   describe '#default_config' do
@@ -42,7 +42,7 @@ describe Lita::Handlers::Github, lita_handler: true do
     end
   end
 
-  describe '.gh_status' do
+  describe '.status' do
     context 'when GitHub status is good' do
       before do
         @octo = double(
@@ -104,7 +104,7 @@ describe Lita::Handlers::Github, lita_handler: true do
     end
   end
 
-  describe '.gh_version' do
+  describe '.version' do
     it 'should send back the Lita version' do
       send_command('gh version')
       expect(replies.last).to eql "lita-github v#{LitaGithub::VERSION}"
