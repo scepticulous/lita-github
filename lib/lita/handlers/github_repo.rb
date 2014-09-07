@@ -121,18 +121,24 @@ module Lita
         opts[:organization] = org
 
         if opts.key?(:team)
-          opts[:team_id] = team_by_slug(opts[:team], org) || team_by_slug(config.default_team_slug, org)
+          t_id = team_id_by_slug(opts[:team], org) || default_team(org)
+          opts[:team_id] = t_id unless t_id.nil?
         else
-          opts[:team_id] = team_by_slug(config.default_team_slug, org)
+          t_id = default_team(org)
+          opts[:team_id] = t_id unless t_id.nil?
         end unless opts.key?(:team_id)
         opts
       end
 
-      def team_by_slug(slug, org)
+      def team_id_by_slug(slug, org)
         octo.organization_teams(org).each do |team|
           return team[:id] if team[:slug] == slug
         end
         nil
+      end
+
+      def default_team(org)
+        config.default_team_slug.nil? ? nil : team_id_by_slug(config.default_team_slug, org)
       end
 
       def should_repo_be_private?(value)
