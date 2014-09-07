@@ -46,6 +46,8 @@ Here is the current functionality:
   * get the current system status for GitHub
 * `!gh version`
   * get the version of handler
+* `!gh token`
+  * generate a TOTP token if `config.handlers.github.totp_secret` is set in the config
 
 ### GitHub Repository Handler
 * `!gh repo create PagerDuty/lita-github private:true team:<team_slug>`

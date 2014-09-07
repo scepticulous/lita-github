@@ -16,6 +16,6 @@
 
 # Administer your Hub of Gits with Lita!
 module LitaGithub
-  VERSION = '0.0.4'
+  VERSION = '0.0.5'
   MAJ, MIN, REV = VERSION.split('.').map(&:to_i)
 end
