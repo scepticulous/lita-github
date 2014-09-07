@@ -1,9 +1,9 @@
 lita-github
 ===========
 [![Build Status](https://img.shields.io/travis/PagerDuty/lita-github/master.svg)](https://travis-ci.org/PagerDuty/lita-github)
-[![MIT License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
-[![RubyGems :: lita-github Gem Version](http://img.shields.io/gem/v/lita-github.svg)](https://rubygems.org/gems/lita-github)
 [![Code Climate Coverage](http://img.shields.io/codeclimate/coverage/github/PagerDuty/lita-github.svg)](https://codeclimate.com/github/PagerDuty/lita-github)
+[![RubyGems :: lita-github Gem Version](http://img.shields.io/gem/v/lita-github.svg)](https://rubygems.org/gems/lita-github)
+[![MIT License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
 Copyright 2014 PagerDuty, Inc.
 
