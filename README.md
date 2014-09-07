@@ -63,3 +63,5 @@ Here is the current functionality:
 * `!gh pr merge #42 PagerDuty/lita-github` or `!shipit #42 PagerDuty/lita-github`
   * This merges the specified pull request
   * This method can be disabled by setting `config.handlers.github.pr_merge_enabled = false` in your configuration file
+* `!gh pr list PagerDuty/lita-github`
+  * list the open pull requests on a repo
