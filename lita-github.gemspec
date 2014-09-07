@@ -44,5 +44,6 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'lita', '~> 3.3'
   s.add_runtime_dependency 'octokit', '~> 3.3'
+  s.add_runtime_dependency 'rotp', '~> 2.0'
   s.add_runtime_dependency 'lita-confirmation'
 end

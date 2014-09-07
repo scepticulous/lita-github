@@ -17,11 +17,12 @@
 require 'spec_helper'
 
 describe Lita::Handlers::Github, lita_handler: true do
-  let(:github) { Lita::Handlers::Forecast.new('robot') }
+  let(:github) { Lita::Handlers::Github.new('robot') }
 
   it { routes_command('gh status').to(:gh_status) }
   it { routes_command('github status').to(:gh_status) }
   it { routes_command('gh version').to(:gh_version) }
+  it { routes_command('gh token').to(:token_generate) }
 
   describe '#default_config' do
     it 'should set repos to private by default' do
@@ -107,6 +108,35 @@ describe Lita::Handlers::Github, lita_handler: true do
     it 'should send back the Lita version' do
       send_command('gh version')
       expect(replies.last).to eql "lita-github v#{LitaGithub::VERSION}"
+    end
+  end
+
+  describe '.token_generate' do
+    before do
+      @secret = 'GZSDEMLDMY3TQYLG'
+      conf_obj = double('Lita::Configuration', totp_secret: @secret)
+      allow(github).to receive(:config).and_return(conf_obj)
+    end
+
+    context 'when token is set' do
+      it 'should return the correct totp token' do
+        t = ROTP::TOTP.new(@secret)
+        send_command('gh token')
+        expect(replies.last).to eql t.now
+      end
+    end
+
+    context 'when token is not set' do
+      before do
+        conf_obj = double('Lita::Configuration', totp_secret: nil)
+        allow(github).to receive(:config).and_return(conf_obj)
+      end
+
+      it 'should return the error message' do
+        send_command('gh token')
+        expect(replies.last)
+          .to eql "'totp_secret' has not been provided in the config, unable to generate TOTP"
+      end
     end
   end
 end
