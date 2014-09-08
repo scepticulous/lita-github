@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'bundler', '~> 1.5'
   s.add_development_dependency 'rake', '~> 10.2'
-  s.add_development_dependency 'rubocop', '~> 0.25.0'
+  s.add_development_dependency 'rubocop', '~> 0.26.0'
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'fuubar', '~> 2.0'
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4', '>= 0.4.0'
