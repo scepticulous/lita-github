@@ -127,6 +127,9 @@ module Lita
           t_id = default_team(org)
           opts[:team_id] = t_id unless t_id.nil?
         end unless opts.key?(:team_id)
+
+        opts[:private] = should_repo_be_private?(opts[:private])
+
         opts
       end
 
