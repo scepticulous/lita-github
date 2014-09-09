@@ -3,9 +3,21 @@
 require 'spec_helper'
 
 describe Lita::Handlers::GithubPR, lita_handler: true do
-  it { routes_command('gh shipit #42 GrapeDuty/lita-test').to(:pr_merge) }
-  it { routes_command('gh pr merge #42 GrapeDuty/lita-test').to(:pr_merge) }
-  it { routes_command('shipit #42 GrapeDuty/lita-test').to(:pr_merge) }
+  # pr_merge command routing
+  it { routes_command('gh shipit GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { routes_command('gh shipit lita-test #42').to(:pr_merge) }
+  it { routes_command('gh pr merge lita-test #42').to(:pr_merge) }
+  it { routes_command('gh pr merge GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { routes_command('shipit GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { routes_command('shipit lita-test #42').to(:pr_merge) }
+
+  # pr_info command routing
+  it { routes_command('gh pr info GrapeDuty/lita-test #42').to(:pr_info) }
+  it { routes_command('gh pr info lita-test #42').to(:pr_info) }
+
+  # pr_list command routing
+  it { routes_command('gh pr list GrapeDuty/lita-test').to(:pr_list) }
+  it { routes_command('gh pr list lita-test').to(:pr_list) }
 
   let(:github_pr) { Lita::Handlers::GithubPR.new('robot') }
   let(:github_org) { 'GrapeDuty' }
@@ -431,7 +443,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
               'Head: 1234567 | Commits: 1 (+42/-0) :: ' \
               "https://github.com/GrapeDuty/lita-test/compare/0987654321...1234567890\n" \
               "PR Comments: 1 | Code Comments: 2\n"
-        send_command("gh pr info #42 #{github_org}/#{github_repo}")
+        send_command("gh pr info #{github_org}/#{github_repo} #42")
         expect(replies.last).to eql r
       end
     end
@@ -459,7 +471,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
               'Head: 1234567 | Commits: 1 (+42/-0) :: ' \
               "https://github.com/GrapeDuty/lita-test/compare/0987654321...1234567890\n" \
               "PR Comments: 1 | Code Comments: 2\n"
-        send_command("gh pr info #42 #{github_org}/#{github_repo}")
+        send_command("gh pr info #{github_org}/#{github_repo} #42")
         expect(replies.last).to eql r
       end
     end
@@ -471,7 +483,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should reply with the not found error' do
-        send_command("gh pr info #42 #{github_org}/#{github_repo}")
+        send_command("gh pr info #{github_org}/#{github_repo} #42")
         expect(replies.last).to eql 'Pull request #42 on GrapeDuty/lita-test not found'
       end
     end
@@ -495,7 +507,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should no-op and say such' do
-        send_command("shipit #42 #{github_org}/#{github_repo}")
+        send_command("shipit #{github_org}/#{github_repo} #42")
         expect(replies.last).to eql disabled_reply
       end
     end
@@ -506,7 +518,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should reply indicating it was invalid' do
-        send_command("shipit #42 #{github_org}/#{github_repo}")
+        send_command("shipit #{github_org}/#{github_repo} #42")
         expect(replies.last).to eql 'Pull request #42 on GrapeDuty/lita-test not found'
       end
     end
@@ -516,11 +528,11 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
         expect(github_pr).to receive(:merge_pr).with(
           'GrapeDuty', 'lita-test', '42', "Merge pull request #42 from GrapeDuty/fix-some-bugs\n\nfix bug"
         )
-        send_command('shipit #42 GrapeDuty/lita-test')
+        send_command('shipit GrapeDuty/lita-test #42')
       end
 
       it 'should confirm merging of PR' do
-        send_command("shipit #42 #{github_org}/#{github_repo}")
+        send_command("shipit #{github_org}/#{github_repo} #42")
         expect(replies.last)
           .to eql "Merged pull request #42 from GrapeDuty/fix-some-bugs\nfix bug"
       end
@@ -533,7 +545,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should confirm the failure' do
-        send_command("shipit #42 #{github_org}/#{github_repo}")
+        send_command("shipit #{github_org}/#{github_repo} #42")
         expect(replies.last)
           .to eql(
             "Failed trying to merge PR #42 (fix bug) :: https://github.com/GrapeDuty/lita-test/pull/42\n"\
@@ -550,7 +562,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should confirm the failure' do
-        send_command("shipit #42 #{github_org}/#{github_repo}")
+        send_command("shipit #{github_org}/#{github_repo} #42")
         expect(replies.last)
           .to eql(
             'An unexpected exception was hit during the GitHub API operation. Please make sure all ' \

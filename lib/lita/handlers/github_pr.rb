@@ -36,19 +36,19 @@ module Lita
       on :loaded, :setup_octo # from LitaGithub::Octo
 
       route(
-        /#{LitaGithub::R::A_REG}pr\s+?info\s+?#(?<pr>\d+?)\s+?#{LitaGithub::R::REPO_REGEX}/,
+        /#{LitaGithub::R::A_REG}pr\s+?info\s+?#{LitaGithub::R::REPO_REGEX}\s+?#(?<pr>\d+?)$/,
         :pr_info,
         command: true,
-        help: { 'gh pr info #42 PagerDuty/lita-github' => 'show some information about the pull request' }
+        help: { 'gh pr info PagerDuty/lita-github #42' => 'show some information about the pull request' }
       )
 
       route(
-        /(?:#{LitaGithub::R::A_REG}(?:pr merge|shipit)|shipit)\s+?#(?<pr>\d+?)\s+?#{LitaGithub::R::REPO_REGEX}/,
+        /(?:#{LitaGithub::R::A_REG}(?:pr merge|shipit)|shipit)\s+?#{LitaGithub::R::REPO_REGEX}\s+?#(?<pr>\d+?)$/,
         :pr_merge, command: true, confirmation: true,
         help: {
-          'gh shipit #42 PagerDuty/lita-github' => 'ship it!',
-          'gh pr merge #42 PagerDuty/lita-github' => 'ship it!',
-          'shipit #42 PagerDuty/lita-github' => 'ship it!'
+          'gh shipit PagerDuty/lita-github #42' => 'ship it!',
+          'gh pr merge PagerDuty/lita-github #42' => 'ship it!',
+          'shipit PagerDuty/lita-github #42' => 'ship it!'
         }
       )
 
