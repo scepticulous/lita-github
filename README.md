@@ -59,9 +59,9 @@ Here is the current functionality:
   * **Note:** This method is disabled by default, you need to enable it by setting `config.handlers.github.repo_delete_enabled = true` in your configuration file
 
 ### Github PR Handler
-* `!gh pr info #42 PagerDuty/lita-github`
+* `!gh pr info PagerDuty/lita-github #42`
   * output some information about the PR. Such as: state (open|closed|merged), build status, user who opened, user who merged, amongst others...
-* `!gh pr merge #42 PagerDuty/lita-github` or `!shipit #42 PagerDuty/lita-github`
+* `!gh pr merge PagerDuty/lita-github #42` or `!shipit PagerDuty/lita-github #42`
   * This merges the specified pull request
   * This method can be disabled by setting `config.handlers.github.pr_merge_enabled = false` in your configuration file
 * `!gh pr list PagerDuty/lita-github`
