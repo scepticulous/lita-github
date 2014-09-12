@@ -20,5 +20,9 @@ module LitaGithub
     def organization(name)
       name.nil? || name.empty? ? config.default_org : name
     end
+
+    def sort_by_name(teams)
+      teams.sort_by { |h| h[:name].downcase }
+    end
   end
 end

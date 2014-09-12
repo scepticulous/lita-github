@@ -45,13 +45,31 @@ describe LitaGithub::Repo do
   describe '.repo_match' do
     before { allow(self).to receive(:organization).and_return('GrapeDuty') }
 
-    let(:resp_obj) do
-      md_mock = { 'org' => 'GrapeDuty', 'repo' => 'lita-test' }
-      double('Lita::Response', match_data: md_mock)
-    end
+    let(:match_data) { { 'org' => 'GrapeDuty', 'repo' => 'lita-test' } }
 
     it 'should return the Org/Repo match' do
-      expect(repo_match(resp_obj)).to eql ['GrapeDuty', 'lita-test']
+      expect(repo_match(match_data)).to eql ['GrapeDuty', 'lita-test']
+    end
+  end
+
+  describe '.repo_has_team?' do
+    before do
+      @teams = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]
+      @octo_obj = double('Octokit::Client', repository_teams: @teams)
+      allow(self).to receive(:octo).and_return(@octo_obj)
+    end
+
+    context 'when repo has the team' do
+      it 'should return be truthy' do
+        expect(@octo_obj).to receive(:repository_teams).with('GrapeDuty/lita-test').and_return(@teams)
+        expect(repo_has_team?('GrapeDuty/lita-test', 4)).to be_truthy
+      end
+    end
+
+    context 'when the repo does not have the team' do
+      it 'should be falsey' do
+        expect(repo_has_team?('GrapeDuty/lita-test', 42)).to be_falsey
+      end
     end
   end
 end

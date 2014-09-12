@@ -29,4 +29,21 @@ describe LitaGithub::Org do
       end
     end
   end
+
+  describe '.sort_by_name' do
+    let(:unsorted_list) do
+      [
+        { name: 'xy' }, { name: 'a' }, { name: 'Zx' }, { name: 'D' }, { name: 'z' }
+      ]
+    end
+    let(:sorted_list) do
+      [
+        { name: 'a' }, { name: 'D' }, { name: 'xy' }, { name: 'z' }, { name: 'Zx' }
+      ]
+    end
+
+    it 'should properly sort the list' do
+      expect(sort_by_name(unsorted_list)).to eql sorted_list
+    end
+  end
 end

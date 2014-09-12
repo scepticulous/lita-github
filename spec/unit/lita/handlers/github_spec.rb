@@ -41,6 +41,14 @@ describe Lita::Handlers::Github, lita_handler: true do
       expect(Lita.config.handlers.github.repo_delete_enabled).to be_falsey
     end
 
+    it 'should disable Lita::Handlers::GithubRepo.repo_team_add by default' do
+      expect(Lita.config.handlers.github.repo_team_add_enabled).to be_falsey
+    end
+
+    it 'should disable Lita::Handlers::GithubRepo.repo_team_rm by default' do
+      expect(Lita.config.handlers.github.repo_team_rm_enabled).to be_falsey
+    end
+
     it 'should enable Lita::Handlers::GithubPR.pr_merge by default' do
       expect(Lita.config.handlers.github.pr_merge_enabled).to be_truthy
     end

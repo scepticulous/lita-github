@@ -34,10 +34,11 @@ describe LitaGithub::Octo do
     allow(Octokit::Client).to receive(:new).with(access_token: 'abc123').and_return(DoubleFixer)
     @conf_obj = double('Lita::Config', access_token: 'abc123')
     allow(self).to receive(:config).and_return(@conf_obj)
-    allow_any_instance_of(DummyClass).to receive(:config).and_return(@conf_obj)
     @dummy = DummyClass.new
+    allow(@dummy).to receive(:config).and_return(@conf_obj)
     @dummy.setup_octo(nil)
   end
+  after { allow(Octokit::Client).to receive(:new).and_call_original }
 
   include LitaGithub::Octo
 

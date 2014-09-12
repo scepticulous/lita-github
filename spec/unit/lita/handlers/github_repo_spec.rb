@@ -32,6 +32,30 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   it { routes_command('gh repo info GrapeDuty/lita-test').to(:repo_info) }
   it { routes_command('gh repo info lita-test').to(:repo_info) }
 
+  # repo_teams_list routing
+  it { routes_command('gh repo teams GrapeDuty/lita-test').to(:repo_teams_list) }
+  it { routes_command('gh repo team list GrapeDuty/lita-test').to(:repo_teams_list) }
+  it { routes_command('gh repo teams lita-test').to(:repo_teams_list) }
+  it { routes_command('gh repo team list lita-test').to(:repo_teams_list) }
+
+  # repo_team_router routing
+  it { routes_command('gh repo team add everyone GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add everyone to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add everyone lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add everyone to lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add 42 GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add 42 to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add 42 lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team add 42 to lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm everyone GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm everyone to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm everyone lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm everyone to lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm 42 GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm 42 to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm 42 lita-test').to(:repo_team_router) }
+  it { routes_command('gh repo team rm 42 to lita-test').to(:repo_team_router) }
+
   let(:github_repo) { Lita::Handlers::GithubRepo.new('robot') }
   let(:github_org) { 'GrapeDuty' }
   let(:disabled_reply) { 'Sorry, this function has either been disabled or not enabled in the config' }
@@ -299,6 +323,229 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
+  describe '.remove_team_from_repo' do
+    before do
+      @octo_obj = double('Octokit::Client', remove_team_repository: true)
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+    end
+
+    context 'when it succeeds' do
+      it 'should reply with the success message' do
+        expect(@octo_obj).to receive(:remove_team_repository).with(42, 'GrapeDuty/lita-test')
+          .and_return(true)
+        r = github_repo.send(:remove_team_from_repo, 'GrapeDuty/lita-test', id: 42, name: 'HeckmanTest')
+        expect(r).to eql "Removed the 'HeckmanTest' team from GrapeDuty/lita-test"
+      end
+    end
+
+    context 'when it fails' do
+      before { allow(@octo_obj).to receive(:remove_team_repository).and_return(false) }
+
+      it 'should reply with the failure message' do
+        r = github_repo.send(:remove_team_from_repo, 'GrapeDuty/lita-test', id: 42, name: 'HeckTest')
+        expect(r).to eql "Something went wrong trying to remove the 'HeckTest' team from GrapeDuty/lita-test"
+      end
+    end
+  end
+
+  describe '.add_team_to_repo' do
+    before do
+      @octo_obj = double('Octokit::Client', add_team_repository: true)
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+    end
+
+    context 'when it succeeds' do
+      it 'should reply with the success message' do
+        expect(@octo_obj).to receive(:add_team_repository).with(42, 'GrapeDuty/lita-test')
+          .and_return(true)
+        r = github_repo.send(:add_team_to_repo, 'GrapeDuty/lita-test', id: 42, name: 'HeckmanTest')
+        expect(r).to eql "Added the 'HeckmanTest' team to GrapeDuty/lita-test"
+      end
+    end
+
+    context 'when it fails' do
+      before { allow(@octo_obj).to receive(:add_team_repository).and_return(false) }
+
+      it 'should reply with the failure message' do
+        r = github_repo.send(:add_team_to_repo, 'GrapeDuty/lita-test', id: 42, name: 'HeckTest')
+        expect(r).to eql(
+          "Something went wrong trying to add the 'HeckTest' team to GrapeDuty/lita-test. " \
+            'Is that team in your organization?'
+        )
+      end
+    end
+  end
+
+  describe '.gh_team' do
+    before do
+      @team1 = { name: 'HeckTest', id: 42 }
+      @team2 = { name: 'Heckman', id: 84 }
+      @octo_obj = double('Octokit::Client', team: {})
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+      allow(github_repo).to receive(:team_id_by_slug).with('Heckman', 'GrapeDuty').and_return(@team2[:id])
+    end
+
+    context 'when the team provided is the team id' do
+      before { allow(@octo_obj).to receive(:team).with(42).and_return(@team1) }
+
+      it 'should return the specific team' do
+        expect(github_repo.send(:gh_team, 'GrapeDuty', 42)).to eql @team1
+      end
+    end
+
+    context 'when the team provided is the team' do
+      before { allow(@octo_obj).to receive(:team).with(84).and_return(@team2) }
+
+      it 'should return the specific team' do
+        expect(github_repo.send(:gh_team, 'GrapeDuty', 'Heckman')).to eql @team2
+      end
+    end
+
+    context 'when the team was not found' do
+      context 'but it found the id by the slug' do
+        before do
+          allow(github_repo).to receive(:team_id_by_slug).with('Wtf', 'GrapeDuty').and_return(88)
+          allow(@octo_obj).to receive(:team).and_raise(Octokit::NotFound.new)
+        end
+
+        it 'should return nil' do
+          expect(github_repo.send(:gh_team, 'GrapeDuty', 'Wtf')).to eql nil
+        end
+      end
+
+      context 'not even by the slug' do
+        before do
+          allow(github_repo).to receive(:team_id_by_slug).with('Wtf', 'GrapeDuty').and_return(nil)
+          allow(@octo_obj).to receive(:team).and_raise(Octokit::NotFound.new)
+        end
+
+        it 'should return nil' do
+          expect(github_repo.send(:gh_team, 'GrapeDuty', 'Wtf')).to eql nil
+        end
+      end
+    end
+  end
+
+  describe '.repo_team_add' do
+    before do
+      match_data = { 'org' => github_org, 'repo' => 'lita-test', 'team' => 'HeckmanTest' }
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_add_enabled: true)
+      @response = double('Lita::Response', match_data: match_data)
+      team = { id: 42, name: 'HeckmanTest' }
+      allow(github_repo).to receive(:config).and_return(conf_obj)
+      allow(github_repo).to receive(:gh_team).with('GrapeDuty', 'HeckmanTest').and_return(team)
+      allow(github_repo).to receive(:repo?).and_return(true)
+      allow(github_repo).to receive(:repo_has_team?).and_return(false)
+      allow(github_repo).to receive(:add_team_to_repo).and_return('attr')
+    end
+
+    context 'when function is disabled' do
+      before do
+        conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_add_enabled: false)
+        allow(github_repo).to receive(:config).and_return(conf_obj)
+      end
+
+      it 'should return the method disabled error' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
+    context 'when valid inputs provided, and all things work out' do
+      it 'should return the text from add_team_to_repo' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql 'attr'
+      end
+    end
+
+    context 'when repo not found' do
+      before { allow(github_repo).to receive(:repo?).and_return(false) }
+
+      it 'should return the repo not found error' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+      end
+    end
+
+    context 'when team not found' do
+      before { allow(github_repo).to receive(:gh_team).and_return(nil) }
+
+      it 'should return the team not found error' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql 'Unable to match any teams based on: HeckmanTest'
+      end
+    end
+
+    context 'when the team is already part of the repo' do
+      before { allow(github_repo).to receive(:repo_has_team?).and_return(true) }
+
+      it 'should mention that the team already exists on the repo' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql "The 'HeckmanTest' team is already a member of GrapeDuty/lita-test"
+      end
+    end
+  end
+
+  describe '.repo_team_rm' do
+    before do
+      match_data = { 'org' => github_org, 'repo' => 'lita-test', 'team' => 'HeckmanTest' }
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_rm_enabled: true)
+      @response = double('Lita::Response', match_data: match_data)
+      team = { id: 42, name: 'HeckmanTest' }
+      allow(github_repo).to receive(:config).and_return(conf_obj)
+      allow(github_repo).to receive(:gh_team).with('GrapeDuty', 'HeckmanTest').and_return(team)
+      allow(github_repo).to receive(:repo?).and_return(true)
+      allow(github_repo).to receive(:repo_has_team?).and_return(true)
+      allow(github_repo).to receive(:remove_team_from_repo).and_return('rtfr')
+    end
+
+    context 'when function is disabled' do
+      before do
+        conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_rm_enabled: false)
+        allow(github_repo).to receive(:config).and_return(conf_obj)
+      end
+
+      it 'should return the method disabled error' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
+    context 'when valid inputs provided, and all things work out' do
+      it 'should return the text from remove_team_to_repo' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql 'rtfr'
+      end
+    end
+
+    context 'when repo not found' do
+      before { allow(github_repo).to receive(:repo?).and_return(false) }
+
+      it 'should return the repo not found error' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+      end
+    end
+
+    context 'when team not found' do
+      before { allow(github_repo).to receive(:gh_team).and_return(nil) }
+
+      it 'should return the team not found error' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql 'Unable to match any teams based on: HeckmanTest'
+      end
+    end
+
+    context 'when the team is not part of the repo' do
+      before { allow(github_repo).to receive(:repo_has_team?).and_return(false) }
+
+      it 'should mention that the team already exists on the repo' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql "The 'HeckmanTest' team is not a member of GrapeDuty/lita-test"
+      end
+    end
+  end
+
   ####
   # Handlers
   ####
@@ -401,6 +648,51 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         send_command("gh repo create #{github_org}/lita-test")
         expect(replies.last).to eql 'hello from PAX prime!'
       end
+    end
+  end
+
+  describe '.repo_teams_list' do
+    before do
+      @teams = [
+        { name: 'Interns', slug: 'interns', id: 84, permission: 'pull' },
+        { name: 'Everyone', slug: 'everyone', id: 42, permission: 'push' }
+      ]
+      @octo_obj = double('Octokit::Client', repository_teams: @teams)
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+    end
+
+    context 'when it finds a repo' do
+      it 'should return the list of teams' do
+        expect(@octo_obj).to receive(:repository_teams).with('GrapeDuty/lita-test').and_return(@teams)
+        send_command("gh repo teams #{github_org}/lita-test")
+        expect(replies.last).to eql 'Showing 2 team(s) for GrapeDuty/lita-test:
+Name: Everyone, Slug: everyone, ID: 42, Perms: push
+Name: Interns, Slug: interns, ID: 84, Perms: pull
+'
+      end
+    end
+
+    context 'when the repo is not valid' do
+      before { allow(@octo_obj).to receive(:repository_teams).and_raise(Octokit::NotFound.new) }
+
+      it 'should say the repo was not found' do
+        send_command("gh repo teams #{github_org}/lita-test")
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+      end
+    end
+  end
+
+  describe '.repo_team_router' do
+    before do
+      allow(github_repo).to receive(:repo_team_something)
+        .with(an_instance_of(Lita::Response)).and_return('ohai')
+    end
+
+    it 'should call the method based on action and respond with its return' do
+      expect(github_repo).to receive(:repo_team_add)
+        .with(an_instance_of(Lita::Response)).and_return('ohai')
+      send_command("gh repo team add 42 #{github_org}/lita-test")
+      expect(replies.last).to eql 'ohai'
     end
   end
 end

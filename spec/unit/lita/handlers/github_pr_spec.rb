@@ -31,8 +31,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
   describe '.pr_match' do
     it 'should return the content of the match data' do
       mock_md = { 'org' => github_org, 'repo' => github_repo, 'pr' => 42 }
-      mock_resp = double('Lita::Response', match_data: mock_md)
-      expect(github_pr.send(:pr_match, mock_resp)).to eql [github_org, github_repo, 42]
+      expect(github_pr.send(:pr_match, mock_md)).to eql [github_org, github_repo, 42]
     end
   end
 

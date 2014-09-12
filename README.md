@@ -57,6 +57,12 @@ Here is the current functionality:
 * `!gh repo delete PagerDuty/lita-github`
   * Deletes the repo you specify, requires confirmation before doing so
   * **Note:** This method is disabled by default, you need to enable it by setting `config.handlers.github.repo_delete_enabled = true` in your configuration file
+* `!gh repo teams PagerDuty/lita-github`
+  * list all of the teams currently attached to a repo
+* `!gh repo team add <TEAM_ID|TEAM_SLUG> PagerDuty/lita-github`
+  * adds the team to the repo -- requires confirmation and enabling via config option (`repo_team_add_enabled = true`)
+* `!gh repo team rm <TEAM_ID|TEAM_SLUG> PagerDuty/lita-github`
+  * removes the team to the repo -- requires confirmation and enabling via config option (`repo_team_rm_enabled = true`)
 
 ### Github PR Handler
 * `!gh pr info PagerDuty/lita-github #42`
@@ -66,3 +72,7 @@ Here is the current functionality:
   * This method can be disabled by setting `config.handlers.github.pr_merge_enabled = false` in your configuration file
 * `!gh pr list PagerDuty/lita-github`
   * list the open pull requests on a repo
+
+### Github Organization Handler
+* `!gh org teams PagerDuty` & `!gh teams PagerDuty`
+  * list the teams for the GitHub repo

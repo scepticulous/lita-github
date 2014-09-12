@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 0.26.0'
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'fuubar', '~> 2.0'
+  s.add_development_dependency 'pry', '~> 0.10', '>= 0.10.1'
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4', '>= 0.4.0'
 
   s.add_runtime_dependency 'lita', '~> 3.3'
