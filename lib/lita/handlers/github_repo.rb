@@ -63,10 +63,33 @@ module Lita
         }
       )
 
+      route(
+        /#{LitaGithub::R::A_REG}repo\s+?(teams|team\s+?list)\s+?#{LitaGithub::R::REPO_REGEX}/,
+        :repo_teams_list,
+        command: true,
+        help: {
+          'gh repo teams PagerDuty/lita-github' => 'list the teams allowed to to access a repo',
+          'gh repo team list PagerDuty/lita-github' => 'list the teams allowed to to access a repo'
+        }
+      )
+
+      # rubocop:disable Metrics/LineLength
+      route(
+        /#{LitaGithub::R::A_REG}repo\s+?team\s+?(?<action>add|rm)\s+?(?<team>[a-zA-Z0-9_\-]+?)(\s+?to)?\s+?#{LitaGithub::R::REPO_REGEX}/,
+        :repo_team_router, command: true, confirmation: true,
+        help: {
+          'gh repo team add everyone PagerDuty/lita-test' => 'add a team using slug to your repo',
+          'gh repo team add 42 PagerDuty/lita-test' => 'add a team using ID to your repo',
+          'gh repo team rm everyone PagerDuty/lita-test' => 'remove a team using slug to your repo',
+          'gh repo team rm 42 PagerDuty/lita-test' => 'remove a team using ID to your repo'
+        }
+      )
+      # rubocop:enable Metrics/LineLength
+
       def repo_create(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
 
-        org, repo = repo_match(response)
+        org, repo = repo_match(response.match_data)
 
         if repo?(rpo(org, repo))
           return response.reply(t('repo_create.exists', org: org, repo: repo))
@@ -80,15 +103,15 @@ module Lita
       def repo_delete(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
 
-        org, repo = repo_match(response)
+        org, repo = repo_match(response.match_data)
 
-        return response.reply(t('repo_delete.not_found', org: org, repo: repo)) unless repo?(rpo(org, repo))
+        return response.reply(t('not_found', org: org, repo: repo)) unless repo?(rpo(org, repo))
 
         response.reply(delete_repo(org, repo))
       end
 
       def repo_info(response)
-        org, repo = repo_match(response)
+        org, repo = repo_match(response.match_data)
         full_name = rpo(org, repo)
         opts = {}
         r_obj = octo.repository(full_name)
@@ -105,7 +128,67 @@ module Lita
         response.reply(t('repo_info.reply', opts))
       end
 
+      def repo_teams_list(response)
+        org, repo = repo_match(response.match_data)
+        full_name = rpo(org, repo)
+
+        begin
+          teams = octo.repository_teams(full_name)
+        rescue Octokit::NotFound
+          return response.reply(t('not_found', org: org, repo: repo))
+        end
+
+        if teams.length == 0
+          reply = t('repo_team_list.none', org: org, repo: full_name)
+        else
+          reply = t('repo_team_list.header', num_teams: teams.length, repo: full_name)
+        end
+
+        sort_by_name(teams).each { |team| reply << t('repo_team_list.team', team.to_h) }
+
+        response.reply(reply)
+      end
+
+      def repo_team_router(response)
+        action = response.match_data['action']
+        response.reply(send("repo_team_#{action}".to_sym, response))
+      end
+
       private
+
+      def repo_team_add(response)
+        return t('method_disabled') if func_disabled?(__method__)
+        md = response.match_data
+        org, repo = repo_match(md)
+        full_name = rpo(org, repo)
+        team = gh_team(org, md['team'])
+
+        return t('not_found', org: org, repo: repo) unless repo?(full_name)
+        return t('team_not_found', team: md['team']) if team.nil?
+
+        if repo_has_team?(full_name, team[:id])
+          return t('repo_team_add.exists', repo: full_name, team: team[:name])
+        end
+
+        add_team_to_repo(full_name, team)
+      end
+
+      def repo_team_rm(response)
+        return t('method_disabled') if func_disabled?(__method__)
+        md = response.match_data
+        org, repo = repo_match(md)
+        full_name = rpo(org, repo)
+        team = gh_team(org, md['team'])
+
+        return t('not_found', org: org, repo: repo) unless repo?(full_name)
+        return t('team_not_found', team: md['team']) if team.nil?
+
+        unless repo_has_team?(full_name, team[:id])
+          return t('repo_team_rm.exists', repo: full_name, team: team[:name])
+        end
+
+        remove_team_from_repo(full_name, team)
+      end
 
       def command_opts(cmd)
         o = {}
@@ -192,6 +275,34 @@ module Lita
           end
         end
         reply
+      end
+
+      def gh_team(org, team)
+        team_id = /^\d+$/.match(team.to_s) ? team : team_id_by_slug(team, org)
+
+        return nil if team_id.nil?
+
+        begin
+          octo.team(team_id)
+        rescue Octokit::NotFound
+          nil
+        end
+      end
+
+      def add_team_to_repo(full_name, team)
+        if octo.add_team_repository(team[:id], full_name)
+          return t('repo_team_add.pass', repo: full_name, team: team[:name])
+        else
+          return t('repo_team_add.fail', repo: full_name, team: team[:name])
+        end
+      end
+
+      def remove_team_from_repo(full_name, team)
+        if octo.remove_team_repository(team[:id], full_name)
+          return t('repo_team_rm.pass', repo: full_name, team: team[:name])
+        else
+          return t('repo_team_rm.fail', repo: full_name, team: team[:name])
+        end
       end
     end
 

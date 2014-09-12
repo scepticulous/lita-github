@@ -27,9 +27,13 @@ module LitaGithub
       octo.repository?(r)
     end
 
-    def repo_match(response)
-      md = response.match_data
+    def repo_match(md)
       [organization(md['org']), md['repo']]
+    end
+
+    def repo_has_team?(full_name, team_id)
+      octo.repository_teams(full_name).each { |t| return true if t[:id] == team_id }
+      false
     end
   end
 end

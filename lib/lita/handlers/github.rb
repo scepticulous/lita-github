@@ -70,8 +70,10 @@ module Lita
         config.totp_secret = nil
 
         # Lita::Handlers::GithubRepo
-        config.repo_create_enabled = true
-        config.repo_delete_enabled = false
+        config.repo_create_enabled    = true
+        config.repo_delete_enabled    = false
+        config.repo_team_add_enabled  = false
+        config.repo_team_rm_enabled   = false
 
         # Lita::Handlers::GithubPR
         config.pr_merge_enabled = true

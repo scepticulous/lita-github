@@ -11,6 +11,8 @@ en:
           totp: "%{token}"
       github_repo:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
+        not_found: "That repo (%{org}/%{repo}) does not exist"
+        team_not_found: "Unable to match any teams based on: %{team}"
         repo_create:
           pass: "Created %{org}/%{repo}: %{repo_url}"
           fail: "Unable to create %{org}/%{repo}"
@@ -18,9 +20,20 @@ en:
         repo_delete:
           pass: "Deleted %{org}/%{repo}"
           fail: "Unable to delete %{org}/%{repo}"
-          not_found: "That repo (%{org}/%{repo}) does not exist"
         repo_info:
           reply: "%{repo} (private:%{private}) :: %{url}\nDesc: %{description}\nIssues: %{issues_count} PRs: %{pr_count}"
+        repo_team_list:
+          none: "Beyond the '%{org}' org owners, %{repo} has no teams"
+          header: "Showing %{num_teams} team(s) for %{repo}:\n"
+          team: "Name: %{name}, Slug: %{slug}, ID: %{id}, Perms: %{permission}\n"
+        repo_team_add:
+          pass: "Added the '%{team}' team to %{repo}"
+          fail: "Something went wrong trying to add the '%{team}' team to %{repo}. Is that team in your organization?"
+          exists: "The '%{team}' team is already a member of %{repo}"
+        repo_team_rm:
+          pass: "Removed the '%{team}' team from %{repo}"
+          fail: "Something went wrong trying to remove the '%{team}' team from %{repo}"
+          exists: "The '%{team}' team is not a member of %{repo}"
       github_pr:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
@@ -38,3 +51,8 @@ en:
         pr_list:
           large_list: "You have more than %{max} open pull requests :(! Here are the ten newest oldest:\n"
           no_prs: "This repo has no open pull requests; good job!"
+      github_org:
+        org_not_found: "The organization '%{org}' was not found. Does my user have ownership permission?"
+        org_teams_list:
+          header: "Showing %{num_teams} team(s) for %{org}:\n"
+          team: "Name: %{name}, Slug: %{slug}, ID: %{id}, Perms: %{permission}\n"

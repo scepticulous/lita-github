@@ -63,7 +63,7 @@ module Lita
       # rubocop:disable Metrics/CyclomaticComplexity
       # rubocop:disable Metrics/PerceivedComplexity
       def pr_info(response)
-        org, repo, pr = pr_match(response)
+        org, repo, pr = pr_match(response.match_data)
         full_name = rpo(org, repo)
 
         pr_h = pull_request(full_name, pr)
@@ -82,7 +82,7 @@ module Lita
 
       def pr_merge(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
-        org, repo, pr = pr_match(response)
+        org, repo, pr = pr_match(response.match_data)
         fullname = rpo(org, repo)
 
         pr_h = pull_request(fullname, pr)
@@ -107,7 +107,7 @@ module Lita
       # rubocop:enable Metrics/PerceivedComplexity
 
       def pr_list(response)
-        org, repo = repo_match(response)
+        org, repo = repo_match(response.match_data)
         full_name = rpo(org, repo)
         reply = ''
 
@@ -132,8 +132,7 @@ module Lita
 
       private
 
-      def pr_match(response)
-        md = response.match_data
+      def pr_match(md)
         [organization(md['org']), md['repo'], md['pr']]
       end
 
