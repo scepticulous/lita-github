@@ -11,7 +11,7 @@ en:
           totp: "%{token}"
       github_repo:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
-        not_found: "That repo (%{org}/%{repo}) does not exist"
+        not_found: "That repo (%{org}/%{repo}) was not found"
         team_not_found: "Unable to match any teams based on: %{team}"
         repo_create:
           pass: "Created %{org}/%{repo}: %{repo_url}"
@@ -34,6 +34,13 @@ en:
           pass: "Removed the '%{team}' team from %{repo}"
           fail: "Something went wrong trying to remove the '%{team}' team from %{repo}"
           exists: "The '%{team}' team is not a member of %{repo}"
+        repo_update_description:
+          updated: "The description for %{repo} has been updated to: '%{desc}'"
+          boom: "An uncaught exception was hit while trying to update the description of %{repo}. Is GitHub having issues?"
+        repo_update_homepage:
+          updated: "The homepage for %{repo} has been updated to: '%{url}'"
+          invalid_url: "The URL provided is not valid: '%{url}'"
+          boom: "An uncaught exception was hit while trying to update the homepage of %{repo}. Is GitHub having issues?"
       github_pr:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
