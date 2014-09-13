@@ -49,6 +49,14 @@ describe Lita::Handlers::Github, lita_handler: true do
       expect(Lita.config.handlers.github.repo_team_rm_enabled).to be_falsey
     end
 
+    it 'should enale Lita::Handlers::GithubRepo.repo_update_description by default' do
+      expect(Lita.config.handlers.github.repo_update_description_enabled).to be_truthy
+    end
+
+    it 'should enale Lita::Handlers::GithubRepo.repo_update_homepage by default' do
+      expect(Lita.config.handlers.github.repo_update_homepage_enabled).to be_truthy
+    end
+
     it 'should enable Lita::Handlers::GithubPR.pr_merge by default' do
       expect(Lita.config.handlers.github.pr_merge_enabled).to be_truthy
     end

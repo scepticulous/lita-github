@@ -56,6 +56,20 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   it { routes_command('gh repo team rm 42 lita-test').to(:repo_team_router) }
   it { routes_command('gh repo team rm 42 to lita-test').to(:repo_team_router) }
 
+  # repo_update_router routing
+  it do
+    routes_command(
+      'gh repo update homepage GrapeDuty/lita-test https://github.com/GrapeDuty/lita-test'
+    ).to(:repo_update_router)
+  end
+  it do
+    routes_command(
+      'gh repo update homepage lita-test https://github.com/GrapeDuty/lita-test'
+    ).to(:repo_update_router)
+  end
+  it { routes_command('gh repo update description GrapeDuty/lita-test Some description here').to(:repo_update_router) }
+  it { routes_command('gh repo update description lita-test Some description here').to(:repo_update_router) }
+
   let(:github_repo) { Lita::Handlers::GithubRepo.new('robot') }
   let(:github_org) { 'GrapeDuty' }
   let(:disabled_reply) { 'Sorry, this function has either been disabled or not enabled in the config' }
@@ -429,26 +443,15 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   describe '.repo_team_add' do
     before do
       match_data = { 'org' => github_org, 'repo' => 'lita-test', 'team' => 'HeckmanTest' }
-      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_add_enabled: true)
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
       @response = double('Lita::Response', match_data: match_data)
       team = { id: 42, name: 'HeckmanTest' }
       allow(github_repo).to receive(:config).and_return(conf_obj)
       allow(github_repo).to receive(:gh_team).with('GrapeDuty', 'HeckmanTest').and_return(team)
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
       allow(github_repo).to receive(:repo?).and_return(true)
       allow(github_repo).to receive(:repo_has_team?).and_return(false)
       allow(github_repo).to receive(:add_team_to_repo).and_return('attr')
-    end
-
-    context 'when function is disabled' do
-      before do
-        conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_add_enabled: false)
-        allow(github_repo).to receive(:config).and_return(conf_obj)
-      end
-
-      it 'should return the method disabled error' do
-        r = github_repo.send(:repo_team_add, @response)
-        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
-      end
     end
 
     context 'when valid inputs provided, and all things work out' do
@@ -458,12 +461,21 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       end
     end
 
+    context 'when function is disabled' do
+      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        r = github_repo.send(:repo_team_add, @response)
+        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
     context 'when repo not found' do
       before { allow(github_repo).to receive(:repo?).and_return(false) }
 
       it 'should return the repo not found error' do
         r = github_repo.send(:repo_team_add, @response)
-        expect(r).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+        expect(r).to eql 'That repo (GrapeDuty/lita-test) was not found'
       end
     end
 
@@ -489,26 +501,15 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   describe '.repo_team_rm' do
     before do
       match_data = { 'org' => github_org, 'repo' => 'lita-test', 'team' => 'HeckmanTest' }
-      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_rm_enabled: true)
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
       @response = double('Lita::Response', match_data: match_data)
       team = { id: 42, name: 'HeckmanTest' }
       allow(github_repo).to receive(:config).and_return(conf_obj)
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
       allow(github_repo).to receive(:gh_team).with('GrapeDuty', 'HeckmanTest').and_return(team)
       allow(github_repo).to receive(:repo?).and_return(true)
       allow(github_repo).to receive(:repo_has_team?).and_return(true)
       allow(github_repo).to receive(:remove_team_from_repo).and_return('rtfr')
-    end
-
-    context 'when function is disabled' do
-      before do
-        conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty', repo_team_rm_enabled: false)
-        allow(github_repo).to receive(:config).and_return(conf_obj)
-      end
-
-      it 'should return the method disabled error' do
-        r = github_repo.send(:repo_team_rm, @response)
-        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
-      end
     end
 
     context 'when valid inputs provided, and all things work out' do
@@ -518,12 +519,21 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       end
     end
 
+    context 'when function is disabled' do
+      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        r = github_repo.send(:repo_team_rm, @response)
+        expect(r).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
     context 'when repo not found' do
       before { allow(github_repo).to receive(:repo?).and_return(false) }
 
       it 'should return the repo not found error' do
         r = github_repo.send(:repo_team_rm, @response)
-        expect(r).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+        expect(r).to eql 'That repo (GrapeDuty/lita-test) was not found'
       end
     end
 
@@ -542,6 +552,121 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       it 'should mention that the team already exists on the repo' do
         r = github_repo.send(:repo_team_rm, @response)
         expect(r).to eql "The 'HeckmanTest' team is not a member of GrapeDuty/lita-test"
+      end
+    end
+  end
+
+  describe '.repo_update_description' do
+    before do
+      match_data = { 'org' => github_org, 'repo' => 'lita-test', 'field' => 'description', 'content' => 'oh hello' }
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
+      @response = double('Lita::Response', match_data: match_data)
+      @octo_obj = double('Octokit::Client', edit_repository: { description: 'oh hello' })
+      allow(github_repo).to receive(:config).and_return(conf_obj)
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
+      allow(github_repo).to receive(:repo?).and_return(true)
+    end
+
+    context 'when valid inputs provided, and all things work out' do
+      it 'should respond that the description was updated' do
+        send_command('gh repo update description lita-test oh hello!')
+        expect(replies.last).to eql "The description for GrapeDuty/lita-test has been updated to: 'oh hello'"
+      end
+    end
+
+    context 'when function disabled' do
+      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        send_command('gh repo update description lita-test A new description!')
+        expect(replies.last).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
+    context 'when repo not found' do
+      before { allow(github_repo).to receive(:repo?).and_return(false) }
+
+      it 'should return the repo not found error' do
+        send_command('gh repo update description lita-test A new description!')
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) was not found'
+      end
+    end
+
+    context 'when Octokit call explodes' do
+      before { allow(@octo_obj).to receive(:edit_repository).and_raise(StandardError.new) }
+
+      it 'should let us know things went a bit unexpected' do
+        send_command('gh repo update description lita-test A new description!')
+        expect(replies.last).to eql(
+          'An uncaught exception was hit while trying to update the description of ' \
+          'GrapeDuty/lita-test. Is GitHub having issues?'
+        )
+      end
+    end
+  end
+
+  describe '.repo_update_homepage' do
+    before do
+      match_data = { 'org' => github_org, 'repo' => 'lita-test', 'field' => 'homepage', 'content' => 'https://test.it' }
+      conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
+      @response = double('Lita::Response', match_data: match_data)
+      @octo_obj = double('Octokit::Client', edit_repository: { homepage: 'https://test.it' })
+      allow(github_repo).to receive(:config).and_return(conf_obj)
+      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
+      allow(github_repo).to receive(:repo?).and_return(true)
+    end
+
+    context 'when valid inputs provided, and all things work out' do
+      it 'should respond that the homepage was updated' do
+        send_command('gh repo update homepage lita-test https://test.it')
+        expect(replies.last).to eql "The homepage for GrapeDuty/lita-test has been updated to: 'https://test.it'"
+      end
+    end
+
+    context 'when function disabled' do
+      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        send_command('gh repo update homepage lita-test https://test.it')
+        expect(replies.last).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+      end
+    end
+
+    context 'when repo not found' do
+      before { allow(github_repo).to receive(:repo?).and_return(false) }
+
+      it 'should return the repo not found error' do
+        send_command('gh repo update homepage lita-test https://test.it')
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) was not found'
+      end
+    end
+
+    context 'when Octokit call explodes' do
+      before { allow(@octo_obj).to receive(:edit_repository).and_raise(StandardError.new) }
+
+      it 'should let us know things went a bit unexpected' do
+        send_command('gh repo update homepage lita-test https://test.it')
+        expect(replies.last).to eql(
+          'An uncaught exception was hit while trying to update the homepage of ' \
+          'GrapeDuty/lita-test. Is GitHub having issues?'
+        )
+      end
+    end
+
+    context 'when URL is invalid' do
+      before do
+        match_data = {
+          'org' => github_org, 'repo' => 'lita-test',
+          'field' => 'homepage', 'content' => 'https://test. it'
+        }
+        @response = double('Lita::Response', match_data: match_data)
+      end
+
+      it 'should return the invalid URL error' do
+        send_command('gh repo update homepage lita-test https://test. it')
+        expect(replies.last).to eql "The URL provided is not valid: 'https://test. it'"
       end
     end
   end
@@ -602,7 +727,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
       it 'should no-op informing you that the repo is not there' do
         send_command("gh repo delete #{github_org}/lita-test")
-        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) was not found'
       end
     end
   end
@@ -677,21 +802,31 @@ Name: Interns, Slug: interns, ID: 84, Perms: pull
 
       it 'should say the repo was not found' do
         send_command("gh repo teams #{github_org}/lita-test")
-        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) does not exist'
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) was not found'
       end
     end
   end
 
   describe '.repo_team_router' do
     before do
-      allow(github_repo).to receive(:repo_team_something)
-        .with(an_instance_of(Lita::Response)).and_return('ohai')
+      allow(github_repo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
     end
 
     it 'should call the method based on action and respond with its return' do
-      expect(github_repo).to receive(:repo_team_add)
-        .with(an_instance_of(Lita::Response)).and_return('ohai')
+      expect(github_repo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
       send_command("gh repo team add 42 #{github_org}/lita-test")
+      expect(replies.last).to eql 'ohai'
+    end
+  end
+
+  describe '.repo_update_router' do
+    before do
+      allow(github_repo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
+    end
+
+    it 'should call the method based on the action and respond with its return' do
+      expect(github_repo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
+      send_command("gh repo update description #{github_org}/lita-test Something funky here")
       expect(replies.last).to eql 'ohai'
     end
   end

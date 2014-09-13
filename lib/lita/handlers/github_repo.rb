@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'uri'
 require 'lita-github/r'
 require 'lita-github/config'
 require 'lita-github/octo'
@@ -84,6 +85,14 @@ module Lita
           'gh repo team rm 42 PagerDuty/lita-test' => 'remove a team using ID to your repo'
         }
       )
+
+      route(
+        /#{LitaGithub::R::A_REG}repo\s+update\s+?(?<field>description|homepage)\s+?#{LitaGithub::R::REPO_REGEX}\s+?(?<content>.*)$/,
+        :repo_update_router, command: true, confirmation: true,
+        help: {
+          'gh repo description PagerDuty/lita-github' => 'get the repo description'
+        }
+      )
       # rubocop:enable Metrics/LineLength
 
       def repo_create(response)
@@ -150,8 +159,13 @@ module Lita
       end
 
       def repo_team_router(response)
-        action = response.match_data['action']
+        action = response.match_data['action'].strip
         response.reply(send("repo_team_#{action}".to_sym, response))
+      end
+
+      def repo_update_router(response)
+        field = response.match_data['field'].strip
+        response.reply(send("repo_update_#{field}".to_sym, response))
       end
 
       private
@@ -188,6 +202,47 @@ module Lita
         end
 
         remove_team_from_repo(full_name, team)
+      end
+
+      def repo_update_description(response)
+        return t('method_disabled') if func_disabled?(__method__)
+        md = response.match_data
+        org, repo = repo_match(md)
+        full_name = rpo(org, repo)
+
+        return t('not_found', org: org, repo: repo) unless repo?(full_name)
+
+        content = md['content'].strip
+
+        begin
+          resp = octo.edit_repository(full_name, description: content)
+        rescue StandardError
+          return t('repo_update_description.boom', repo: full_name)
+        end
+
+        t('repo_update_description.updated', repo: full_name, desc: resp[:description])
+      end
+
+      def repo_update_homepage(response)
+        return t('method_disabled') if func_disabled?(__method__)
+        md = response.match_data
+        org, repo = repo_match(md)
+        full_name = rpo(org, repo)
+
+        return t('not_found', org: org, repo: repo) unless repo?(full_name)
+
+        regexp = URI::DEFAULT_PARSER.regexp[:ABS_URI]
+        content = md['content'].strip
+
+        return t('repo_update_homepage.invalid_url', url: content) unless regexp.match(content)
+
+        begin
+          resp = octo.edit_repository(full_name, homepage: content)
+        rescue StandardError
+          return t('repo_update_homepage.boom', repo: full_name)
+        end
+
+        t('repo_update_homepage.updated', repo: full_name, url: resp[:homepage])
       end
 
       def command_opts(cmd)
