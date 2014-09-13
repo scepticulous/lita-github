@@ -63,6 +63,10 @@ Here is the current functionality:
   * adds the team to the repo -- requires confirmation and enabling via config option (`repo_team_add_enabled = true`)
 * `!gh repo team rm <TEAM_ID|TEAM_SLUG> PagerDuty/lita-github`
   * removes the team to the repo -- requires confirmation and enabling via config option (`repo_team_rm_enabled = true`)
+* `!gh repo update description PagerDuty/lita-github The new lita-github description!`
+  * update the description of the repo, can be disabled with: `repo_update_description_enabled = false`
+* `!gh repo update homepage lita-github https://github.com/PagerDuty/lita-github`
+  * update the homepage of the repo, can be disabled with: `repo_update_homepage_enabled = false`
 
 ### Github PR Handler
 * `!gh pr info PagerDuty/lita-github #42`
