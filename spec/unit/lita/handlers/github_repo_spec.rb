@@ -763,6 +763,15 @@ Name: Interns, Slug: interns, ID: 84, Perms: pull
       end
     end
 
+    context 'when it finds a repo with no teams but the owners' do
+      before { allow(@octo_obj).to receive(:repository_teams).and_return([]) }
+
+      it 'should return the fact there are no teams' do
+        send_command("gh repo teams #{github_org}/lita-test")
+        expect(replies.last).to eql "Beyond the 'GrapeDuty' org owners, GrapeDuty/lita-test has no teams"
+      end
+    end
+
     context 'when the repo is not valid' do
       before { allow(@octo_obj).to receive(:repository_teams).and_raise(Octokit::NotFound.new) }
 
