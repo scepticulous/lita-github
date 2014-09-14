@@ -80,3 +80,5 @@ Here is the current functionality:
 ### Github Organization Handler
 * `!gh org teams PagerDuty` & `!gh teams PagerDuty`
   * list the teams for the GitHub repo
+
+There is also an early version of organization team management (add / remove) not documented as well. Documentation is missing because it's not feature complete.
