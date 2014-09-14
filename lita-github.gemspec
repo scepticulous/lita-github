@@ -42,6 +42,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'fuubar', '~> 2.0'
   s.add_development_dependency 'pry', '~> 0.10', '>= 0.10.1'
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4', '>= 0.4.0'
+  s.add_development_dependency 'yard', '~> 0.8.7'
 
   s.add_runtime_dependency 'lita', '~> 3.3'
   s.add_runtime_dependency 'octokit', '~> 3.3'

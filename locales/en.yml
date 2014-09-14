@@ -59,7 +59,17 @@ en:
           large_list: "You have more than %{max} open pull requests :(! Here are the ten newest oldest:\n"
           no_prs: "This repo has no open pull requests; good job!"
       github_org:
-        org_not_found: "The organization '%{org}' was not found. Does my user have ownership permission?"
+        method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
+        org_not_found: "The organization '%{org}' was not found. Does my user have ownership perms?"
+        team_not_found: "Unable to match any teams based on: %{team}"
         org_teams_list:
           header: "Showing %{num_teams} team(s) for %{org}:\n"
           team: "Name: %{name}, Slug: %{slug}, ID: %{id}, Perms: %{permission}\n"
+        org_team_add:
+          missing_option: "Missing the %{opt} option\n"
+          perm_invalid: "Valid perms are: pull push admin -- they can be selectively enabled via the config\n"
+          perm_not_permitted: "Sorry, the permission level you requested was not allowed in the config. Right now the only perms permitted are: %{perms}"
+          created_team: "The '%{name}' team was created; Slug: %{slug}, ID: %{id}, Perms: %{permission}"
+        org_team_rm:
+          pass: "The '%{name}' team was deleted. Its ID was %{id}"
+          fail: "Something went wrong trying to delete the '%{name}' team. Is Github having issues?"
