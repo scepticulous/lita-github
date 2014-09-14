@@ -79,6 +79,11 @@ module Lita
 
         # Lita::Handlers::GithubPR
         config.pr_merge_enabled = true
+
+        # Lita::Handlers::GithubOrg
+        config.org_team_add_enabled       = false
+        config.org_team_rm_enabled        = false
+        config.org_team_add_allowed_perms = %w(pull)
       end
 
       def status(response)

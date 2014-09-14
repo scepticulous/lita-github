@@ -60,6 +60,18 @@ describe Lita::Handlers::Github, lita_handler: true do
     it 'should enable Lita::Handlers::GithubPR.pr_merge by default' do
       expect(Lita.config.handlers.github.pr_merge_enabled).to be_truthy
     end
+
+    it 'should disable Lita::Handlers::GithubOrg.org_team_add by default' do
+      expect(Lita.config.handlers.github.org_team_add_enabled).to be_falsey
+    end
+
+    it 'should disable Lita::Handlers::GithubOrg.org_team_rm by default' do
+      expect(Lita.config.handlers.github.org_team_rm_enabled).to be_falsey
+    end
+
+    it 'should allow only teams with "pull" permissions to be created by default' do
+      expect(Lita.config.handlers.github.org_team_add_allowed_perms).to eql %w(pull)
+    end
   end
 
   describe '.status' do

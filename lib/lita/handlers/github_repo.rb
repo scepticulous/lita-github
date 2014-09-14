@@ -16,6 +16,7 @@
 
 require 'uri'
 require 'lita-github/r'
+require 'lita-github/general'
 require 'lita-github/config'
 require 'lita-github/octo'
 require 'lita-github/org'
@@ -27,6 +28,7 @@ module Lita
   module Handlers
     # GitHub Lita Handler
     class GithubRepo < Handler
+      include LitaGithub::General # Github handler common-use methods
       include LitaGithub::Config  # Github handler Lita configuration methods
       include LitaGithub::Octo    # Github handler common-use Octokit methods
       include LitaGithub::Org     # Github handler common-use Organization methods
@@ -104,7 +106,7 @@ module Lita
           return response.reply(t('repo_create.exists', org: org, repo: repo))
         end
 
-        opts = extrapolate_create_opts(command_opts(response.args.join(' ')), org)
+        opts = extrapolate_create_opts(opts_parse(response.message.body), org)
 
         response.reply(create_repo(org, repo, opts))
       end
@@ -245,16 +247,6 @@ module Lita
         t('repo_update_homepage.updated', repo: full_name, url: resp[:homepage])
       end
 
-      def command_opts(cmd)
-        o = {}
-        cmd.scan(LitaGithub::R::OPT_REGEX).flatten.compact.each do |opt|
-          k, v = opt.strip.split(':')
-          k = k.to_sym
-          o[k] = v unless o.key?(k)
-        end
-        o
-      end
-
       def extrapolate_create_opts(opts, org)
         opts[:organization] = org
 
@@ -269,13 +261,6 @@ module Lita
         opts[:private] = should_repo_be_private?(opts[:private])
 
         opts
-      end
-
-      def team_id_by_slug(slug, org)
-        octo.organization_teams(org).each do |team|
-          return team[:id] if team[:slug] == slug
-        end
-        nil
       end
 
       def default_team(org)
@@ -333,12 +318,12 @@ module Lita
       end
 
       def gh_team(org, team)
-        team_id = /^\d+$/.match(team.to_s) ? team : team_id_by_slug(team, org)
+        t_id = team_id(team, org)
 
-        return nil if team_id.nil?
+        return nil if t_id.nil?
 
         begin
-          octo.team(team_id)
+          octo.team(t_id)
         rescue Octokit::NotFound
           nil
         end

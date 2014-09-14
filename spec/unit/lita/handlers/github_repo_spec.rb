@@ -152,29 +152,6 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
-  describe '.team_id_by_slug' do
-    before do
-      @teams = [
-        { id: 1, slug: 'hi' },
-        { id: 42, slug: 'heckman' },
-        { id: 84, slug: 'orwell' }
-      ]
-      @octo_obj = double('Octokit::Client', organization_teams: @teams)
-      allow(github_repo).to receive(:octo).and_return(@octo_obj)
-    end
-
-    it 'should return the team id of the team matching the slug' do
-      expect(@octo_obj).to receive(:organization_teams).with(github_org).and_return(@teams)
-      expect(github_repo.send(:team_id_by_slug, 'heckman', github_org)).to eql 42
-      expect(github_repo.send(:team_id_by_slug, 'orwell', github_org)).to eql 84
-      expect(github_repo.send(:team_id_by_slug, 'unknown', github_org)).to be_nil
-    end
-
-    it 'should return nil if unknown' do
-      expect(github_repo.send(:team_id_by_slug, 'unknown', 'x')).to be_nil
-    end
-  end
-
   describe '.extrapolate_create_opts' do
     before do
       @eco_opts = {}
@@ -265,17 +242,6 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         expect(github_repo).not_to receive(:team_id_by_slug)
         expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
       end
-    end
-  end
-
-  describe '.command_opts' do
-    it 'should find the valid options' do
-      o = ' private:true team:heckman bacon:always bacon:sometimes'
-      co = github_repo.send(:command_opts, o)
-      expect(co).to be_an_instance_of Hash
-      expect(co[:private]).to eql 'true'
-      expect(co[:team]).to eql 'heckman'
-      expect(co[:bacon]).to eql 'always' # of course it's always
     end
   end
 
