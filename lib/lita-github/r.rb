@@ -16,6 +16,8 @@
 
 module LitaGithub
   # Github handler common-use regex constants
+  #
+  # @author Tim Heckman <tim@pagerduty.com>
   module R
     # command alias regex (!gh or !github for example)
     A_REG     ||= '(?:gh|github)\s+?'

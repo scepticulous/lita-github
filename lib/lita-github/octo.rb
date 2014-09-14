@@ -18,19 +18,33 @@ require 'octokit'
 
 module LitaGithub
   # Github handler common-use Octokit methods
+  #
+  # @author Tim Heckman <tim@pagerduty.com>
   module Octo
-    # pull the access token from the config
+    # Accessor method for the Github access token in the config
+    #
+    # @author Tim Heckman <tim@pagerduty.com>
+    # @return [String] the Github API access token
     def access_token
       config.access_token
     end
 
-    # set up the Octokit client
+    # To be used to set up Octokit::Client when loading the Handler class
+    #
+    # @author Tim Heckman <tim@pagerduty.com>
+    # @return [NilClass]
     def setup_octo(_)
       @@octo ||= Octokit::Client.new(access_token: access_token)
       @@octo.auto_paginate = true
+      nil
     end
 
-    # object access method for Octokit client
+    # Object access method for Octokit client
+    #
+    # @author Tim Heckman <tim@pagerduty.com>
+    # @return [Octokit::Client]
+    # @example
+    #  octo.create_team('PagerDuty', name: 'Example Group', perms:pull)
     def octo
       @@octo
     end

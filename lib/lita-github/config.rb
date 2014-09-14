@@ -16,7 +16,12 @@
 
 module LitaGithub
   # Github handler Lita configuration methods
+  #
+  # @author Tim Heckman <tim@pagerduty.com>
   module Config
+    # Return the Lita::Config object for the Github handler
+    #
+    # @return [Lita::Config] the config object for Lita::Handlers::Github
     def config
       Lita.config.handlers.github
     end

@@ -16,7 +16,14 @@
 
 module LitaGithub
   # Github handler common-use method filters
+  #
+  # @author Tim Heckman <tim@pagerduty.com>
   module Filters
+    # Returns whether or not the function has been disabled in the config
+    #
+    # @param method [String] the method name, usually just __method__
+    # @return [TrueClass] if function is disabled
+    # @return [FalseClass] if function is disabled
     def func_disabled?(method)
       config.send("#{method}_enabled".to_sym) ? false : true
     end
