@@ -15,7 +15,14 @@
 # limitations under the License.
 
 # Administer your Hub of Gits with Lita!
+#
+# The namespace for non-handler code of the lita-github plugin
+#
+# @author Tim Heckman <tim@pagerduty.com>
 module LitaGithub
+  # lita-github version
   VERSION = '0.0.11'
+
+  # lita-github version split amongst different revisions
   MAJ, MIN, REV = VERSION.split('.').map(&:to_i)
 end
