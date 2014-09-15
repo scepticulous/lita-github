@@ -21,7 +21,7 @@
 # @author Tim Heckman <tim@pagerduty.com>
 module LitaGithub
   # lita-github version
-  VERSION = '0.0.11'
+  VERSION = '0.0.12'
 
   # lita-github version split amongst different revisions
   MAJ, MIN, REV = VERSION.split('.').map(&:to_i)
