@@ -88,7 +88,7 @@ module Lita
 
       def status(response)
         status = octo.github_status_last_message
-        response.reply(t("status.#{status[:status]}", status))
+        response.reply(t("status.#{status[:status]}", status.to_h))
       end
 
       def version(response)
