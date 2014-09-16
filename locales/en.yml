@@ -9,6 +9,15 @@ en:
         token_generate:
           no_secret: "'totp_secret' has not been provided in the config, unable to generate TOTP"
           totp: "%{token}"
+        whois:
+          user_not_found: "Sorry, unable to locate the GitHub user %{username}"
+          id: "ID: %{i}"
+          orgs: "Orgs: %{o}\n"
+          email: "Email: %{e}"
+          company: "Company: %{c}\n"
+          location: "Located: %{l}\n"
+          account_info: "GitHub Admin: %{site_admin}, Repos: %{public_repos}, Gists: %{public_gists}\n"
+          user_info: "Following: %{following}, Followers: %{followers}, Created: %{created_at}"
       github_repo:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         not_found: "That repo (%{org}/%{repo}) was not found"
