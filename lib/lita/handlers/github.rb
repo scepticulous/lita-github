@@ -56,6 +56,15 @@ module Lita
         }
       )
 
+      route(
+        /#{LitaGithub::R::A_REG}(?:whois|user)\s+(?<username>[a-zA-Z0-9_\-]+)/,
+        :whois,
+        command: true,
+        help: {
+          'gh whois theckman' => 'show some information about that GitHub user'
+        }
+      )
+
       def self.default_config(config)
         # when setting default configuration values please remember one thing:
         # secure and safe by default
@@ -102,6 +111,48 @@ module Lita
           response.reply(t('token_generate.no_secret'))
         end
       end
+
+      def whois(response)
+        username = response.match_data['username'].strip
+
+        begin
+          user = octo.user(username)
+        rescue Octokit::NotFound
+          return response.reply(t('whois.user_not_found', username: username))
+        end
+
+        orgs = octo.organizations(username).map { |o| o[:login] }
+        reply = whois_reply(user, orgs)
+
+        response.reply(reply)
+      end
+
+      private
+
+      def key_valid?(val)
+        (val.nil? || val.empty?) ? false : true
+      end
+
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
+      def whois_reply(user, orgs)
+        name = user.key?(:name) && !user[:name].nil? ? " (#{user[:name]})" : ''
+
+        reply = "#{user[:login]}#{name} :: #{user[:html_url]}\n"
+
+        reply << t('whois.location', l: user[:location]) if key_valid?(user[:location])
+        reply << t('whois.company', c: user[:company]) if key_valid?(user[:company])
+        reply << t('whois.orgs', o: orgs.join(', ')) unless orgs.empty?
+
+        reply << t('whois.id', i: user[:id])
+        key_valid?(user[:email]) ? reply << ", #{t('whois.email', e: user[:email])}\n" : reply << "\n"
+
+        reply << t('whois.account_info', user.to_h)
+        reply << t('whois.user_info', user.to_h)
+        reply
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
     end
 
     Lita.register_handler(Github)

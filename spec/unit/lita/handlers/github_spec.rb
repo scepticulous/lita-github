@@ -19,10 +19,19 @@ require 'spec_helper'
 describe Lita::Handlers::Github, lita_handler: true do
   let(:github) { Lita::Handlers::Github.new('robot') }
 
+  # status routing
   it { routes_command('gh status').to(:status) }
   it { routes_command('github status').to(:status) }
+
+  # version routing
   it { routes_command('gh version').to(:version) }
+
+  # token routing
   it { routes_command('gh token').to(:token_generate) }
+
+  # whois routing
+  it { routes_command('gh whois theckman').to(:whois) }
+  it { routes_command('gh user theckman').to(:whois) }
 
   describe '#default_config' do
     it 'should set default team to nil' do
@@ -74,6 +83,138 @@ describe Lita::Handlers::Github, lita_handler: true do
     end
   end
 
+  ####
+  # Helper Methods
+  ####
+  describe '.key_valid?' do
+    context 'when value is nil' do
+      it 'should be false' do
+        expect(github.send(:key_valid?, nil)).to be_falsey
+      end
+    end
+
+    context 'when value is empty String ("")' do
+      it 'should be false' do
+        expect(github.send(:key_valid?, '')).to be_falsey
+      end
+    end
+
+    context 'when value is a String' do
+      it 'should be true' do
+        expect(github.send(:key_valid?, 'something')).to be_truthy
+      end
+    end
+  end
+
+  describe '.whois_reply' do
+    before do
+      @user_obj = {
+        name: 'Tim Heckman',
+        login: 'theckman',
+        location: 'San Francisco, CA',
+        company: 'PagerDuty, Inc.',
+        id: 787_332,
+        email: 'tim@pagerduty.com',
+        html_url: 'https://github.com/theckman',
+        site_admin: false,
+        public_repos: 42,
+        public_gists: 1,
+        following: 20,
+        followers: 10,
+        created_at: Time.parse('2011-05-14 04:16:33 UTC')
+      }
+      @orgs = %w(PagerDuty GrapeDuty)
+    end
+
+    context 'when all fields are there' do
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman (Tim Heckman) :: https://github.com/theckman
+Located: San Francisco, CA
+Company: PagerDuty, Inc.
+Orgs: PagerDuty, GrapeDuty
+ID: 787332, Email: tim@pagerduty.com
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+
+    context 'when name is unset' do
+      before { @user_obj.delete(:name) }
+
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman :: https://github.com/theckman
+Located: San Francisco, CA
+Company: PagerDuty, Inc.
+Orgs: PagerDuty, GrapeDuty
+ID: 787332, Email: tim@pagerduty.com
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+
+    context 'when location is unset' do
+      before { @user_obj.delete(:location) }
+
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman (Tim Heckman) :: https://github.com/theckman
+Company: PagerDuty, Inc.
+Orgs: PagerDuty, GrapeDuty
+ID: 787332, Email: tim@pagerduty.com
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+
+    context 'when company is unset' do
+      before { @user_obj.delete(:company) }
+
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman (Tim Heckman) :: https://github.com/theckman
+Located: San Francisco, CA
+Orgs: PagerDuty, GrapeDuty
+ID: 787332, Email: tim@pagerduty.com
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+
+    context 'when orgs is empty' do
+      before { @orgs.clear }
+
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman (Tim Heckman) :: https://github.com/theckman
+Located: San Francisco, CA
+Company: PagerDuty, Inc.
+ID: 787332, Email: tim@pagerduty.com
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+
+    context 'when email is empty string' do
+      before { @user_obj[:email] = '' }
+
+      it 'should reply with the proper response' do
+        r = github.send(:whois_reply, @user_obj, @orgs)
+        expect(r).to eql 'theckman (Tim Heckman) :: https://github.com/theckman
+Located: San Francisco, CA
+Company: PagerDuty, Inc.
+Orgs: PagerDuty, GrapeDuty
+ID: 787332
+GitHub Admin: false, Repos: 42, Gists: 1
+Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+      end
+    end
+  end
+
+  ####
+  # Handlers
+  ####
   describe '.status' do
     context 'when GitHub status is good' do
       before do
@@ -168,6 +309,49 @@ describe Lita::Handlers::Github, lita_handler: true do
         send_command('gh token')
         expect(replies.last)
           .to eql "'totp_secret' has not been provided in the config, unable to generate TOTP"
+      end
+    end
+  end
+
+  describe '.whois' do
+    before do
+      @user_obj = {
+        name: 'Tim Heckman',
+        login: 'theckman',
+        location: 'San Francisco, CA',
+        company: 'PagerDuty, Inc.',
+        id: 787_332,
+        email: 'tim@pagerduty.com',
+        html_url: 'https://github.com/theckman',
+        site_admin: false,
+        public_repos: 42,
+        public_gists: 1,
+        following: 20,
+        followers: 10,
+        created_at: Time.parse('2011-05-14 04:16:33 UTC')
+      }
+      @orgs = [{ login: 'PagerDuty' }, { login: 'GrapeDuty' }]
+      @octo_obj = double('Octokit::Client', user: @user_obj, organizations: @orgs)
+      allow(github).to receive(:octo).and_return(@octo_obj)
+      allow(github).to receive(:whois_reply).and_return('StubbedResponse')
+    end
+
+    context 'when all goes well' do
+      it 'should return the response from whois_reply' do
+        expect(@octo_obj).to receive(:user).with('theckman').and_return(@user_obj)
+        expect(@octo_obj).to receive(:organizations).with('theckman').and_return(@orgs)
+        expect(github).to receive(:whois_reply).with(@user_obj, %w(PagerDuty GrapeDuty)).and_return('StubbedResponse')
+        send_command('gh whois theckman')
+        expect(replies.last).to eql 'StubbedResponse'
+      end
+    end
+
+    context 'when user can not be found' do
+      before { allow(@octo_obj).to receive(:user).with('theckman').and_raise(Octokit::NotFound.new) }
+
+      it 'should return the response from whois_reply' do
+        send_command('gh whois theckman')
+        expect(replies.last).to eql 'Sorry, unable to locate the GitHub user theckman'
       end
     end
   end
