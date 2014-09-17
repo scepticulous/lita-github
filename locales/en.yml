@@ -17,7 +17,7 @@ en:
           company: "Company: %{c}\n"
           location: "Located: %{l}\n"
           account_info: "GitHub Admin: %{site_admin}, Repos: %{public_repos}, Gists: %{public_gists}\n"
-          user_info: "Following: %{following}, Followers: %{followers}, Created: %{created_at}"
+          user_info: "Following: %{following}, Followers: %{followers}, Joined: %{created_at}"
       github_repo:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         not_found: "That repo (%{org}/%{repo}) was not found"

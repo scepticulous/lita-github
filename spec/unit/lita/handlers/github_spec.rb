@@ -135,7 +135,7 @@ Company: PagerDuty, Inc.
 Orgs: PagerDuty, GrapeDuty
 ID: 787332, Email: tim@pagerduty.com
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
 
@@ -150,7 +150,7 @@ Company: PagerDuty, Inc.
 Orgs: PagerDuty, GrapeDuty
 ID: 787332, Email: tim@pagerduty.com
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
 
@@ -164,7 +164,7 @@ Company: PagerDuty, Inc.
 Orgs: PagerDuty, GrapeDuty
 ID: 787332, Email: tim@pagerduty.com
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
 
@@ -178,7 +178,7 @@ Located: San Francisco, CA
 Orgs: PagerDuty, GrapeDuty
 ID: 787332, Email: tim@pagerduty.com
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
 
@@ -192,7 +192,7 @@ Located: San Francisco, CA
 Company: PagerDuty, Inc.
 ID: 787332, Email: tim@pagerduty.com
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
 
@@ -207,7 +207,7 @@ Company: PagerDuty, Inc.
 Orgs: PagerDuty, GrapeDuty
 ID: 787332
 GitHub Admin: false, Repos: 42, Gists: 1
-Following: 20, Followers: 10, Created: 2011-05-14 04:16:33 UTC'
+Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       end
     end
   end
