@@ -71,6 +71,9 @@ en:
         method_disabled: "Sorry, this function has either been disabled or not enabled in the config"
         org_not_found: "The organization '%{org}' was not found. Does my user have ownership perms?"
         team_not_found: "Unable to match any teams based on: %{team}"
+        user_not_found: "Unable to find the GitHub user %{n}"
+        nope: "No...\n\nಠ_ಠ"
+        boom: "I had a problem :( ... %{m}"
         org_teams_list:
           header: "Showing %{num_teams} team(s) for %{org}:\n"
           team: "Name: %{name}, Slug: %{slug}, ID: %{id}, Perms: %{permission}\n"
@@ -82,3 +85,12 @@ en:
         org_team_rm:
           pass: "The '%{name}' team was deleted. Its ID was %{id}"
           fail: "Something went wrong trying to delete the '%{name}' team. Is Github having issues?"
+        org_eject_user:
+          ejected: "Ejected %{user} out of %{org}"
+          failed: "Failed to eject the user from the organization for an unknown reason"
+        org_user_rm:
+          removed: "%{u} has been removed from the '%{o}/%{t}' (%{s}) team"
+          failed: "Failed to remove the user from the '%{t}' team for some unknown reason"
+        org_user_add:
+          added: "%{u} has been added to the '%{o}/%{t}' (%{s}) team"
+          failed: "Failed to add the user to the '%{t}' team for some unknown reason"

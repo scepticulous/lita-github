@@ -42,6 +42,10 @@ describe Lita::Handlers::Github, lita_handler: true do
       expect(Lita.config.handlers.github.repo_private_default).to be_truthy
     end
 
+    it 'should allow only teams with "pull" permissions to be created by default' do
+      expect(Lita.config.handlers.github.org_team_add_allowed_perms).to eql %w(pull)
+    end
+
     it 'should enable Lita::Handlers::GithubRepo.repo_create by default' do
       expect(Lita.config.handlers.github.repo_create_enabled).to be_truthy
     end
@@ -78,8 +82,16 @@ describe Lita::Handlers::Github, lita_handler: true do
       expect(Lita.config.handlers.github.org_team_rm_enabled).to be_falsey
     end
 
-    it 'should allow only teams with "pull" permissions to be created by default' do
-      expect(Lita.config.handlers.github.org_team_add_allowed_perms).to eql %w(pull)
+    it 'should disable Lita::Handlers::GithubOrg.org_user_add by default' do
+      expect(Lita.config.handlers.github.org_user_add_enabled).to be_falsey
+    end
+
+    it 'should disable Lita::Handlers::GithubOrg.org_user_rm by default' do
+      expect(Lita.config.handlers.github.org_user_rm_enabled).to be_falsey
+    end
+
+    it 'should disable Lita::Handlers::GithubOrg.org_eject_user by default' do
+      expect(Lita.config.handlers.github.org_eject_user_enabled).to be_falsey
     end
   end
 
