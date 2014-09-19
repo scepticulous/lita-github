@@ -62,50 +62,6 @@ describe LitaGithub::R do
         m = s.scan(subject).flatten.map(&:strip)
         expect(m).to eql ['test:pass', 'bacon:always', 'test:coverage']
       end
-    end
-
-    context 'it should not match' do
-      it 'test-stuff:fail' do
-        s = ' test-stuff:fail'
-        m = s.scan(subject).flatten
-        expect(m).to be_empty
-      end
-
-      it 'test: fail' do
-        s = ' test: fail'
-        m = s.scan(subject).flatten
-        expect(m).to be_empty
-      end
-
-      it 'test:fail (no leading space)' do
-        s = 'test:fail'
-        m = s.scan(subject).flatten
-        expect(m).to be_empty
-      end
-    end
-  end
-
-  describe '::E_OPT_REGEX' do
-    subject { LitaGithub::R::E_OPT_REGEX }
-
-    context 'it should match' do
-      it 'test:pass' do
-        s = ' test:pass'
-        m = s.scan(subject).flatten.map(&:strip)
-        expect(m).to eql ['test:pass']
-      end
-
-      it 'test7_pass:pAss_test' do
-        s = ' test7_pass:pAss_test'
-        m = s.scan(subject).flatten.map(&:strip)
-        expect(m).to eql ['test7_pass:pAss_test']
-      end
-
-      it 'test:pass bacon:always test:coverage' do
-        s = ' test:pass bacon:always test:coverage'
-        m = s.scan(subject).flatten.map(&:strip)
-        expect(m).to eql ['test:pass', 'bacon:always', 'test:coverage']
-      end
 
       it 'testing:"hi" test:"hello there"' do
         s = ' testing:"hi" test:"hello there"'

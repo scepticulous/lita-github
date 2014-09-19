@@ -21,19 +21,8 @@ describe LitaGithub::General do
 
   describe '.opts_parse' do
     it 'should find the valid options' do
-      o = ' private:true team:heckman bacon:always bacon:sometimes'
-      co = opts_parse(o)
-      expect(co).to be_an_instance_of Hash
-      expect(co[:private]).to eql 'true'
-      expect(co[:team]).to eql 'heckman'
-      expect(co[:bacon]).to eql 'always' # of course it's always
-    end
-  end
-
-  describe '.e_opts_parse' do
-    it 'should find the valid options' do
       o = %q( private:true team:heckman bacon:always bacon:sometimes string1:"something here" string2:'something else')
-      co = e_opts_parse(o)
+      co = opts_parse(o)
       expect(co).to be_an_instance_of Hash
       expect(co[:private]).to eql 'true'
       expect(co[:team]).to eql 'heckman'
