@@ -68,8 +68,9 @@ module Lita
       def self.default_config(config)
         # when setting default configuration values please remember one thing:
         # secure and safe by default
-        config.default_team_slug    = nil
-        config.repo_private_default = true
+        config.default_team_slug          = nil
+        config.repo_private_default       = true
+        config.org_team_add_allowed_perms = %w(pull)
 
         ####
         # Method Filters
@@ -92,7 +93,9 @@ module Lita
         # Lita::Handlers::GithubOrg
         config.org_team_add_enabled       = false
         config.org_team_rm_enabled        = false
-        config.org_team_add_allowed_perms = %w(pull)
+        config.org_user_add_enabled       = false
+        config.org_user_rm_enabled        = false
+        config.org_eject_user_enabled     = false
       end
 
       def status(response)

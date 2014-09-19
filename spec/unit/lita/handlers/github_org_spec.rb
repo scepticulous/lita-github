@@ -29,7 +29,30 @@ describe Lita::Handlers::GithubOrg, lita_handler: true do
   it { routes_command('gh org team add GrapeDuty name:"All Staff" perms:pull').to(:org_team_add) }
   it { routes_command('gh org team add name:"All Staff" perms:pull').to(:org_team_add) }
 
+  # org_team_rm routing
+  it { routes_command('gh org team rm GrapeDuty ops').to(:org_team_rm) }
+  it { routes_command('gh org team rm GrapeDuty 42').to(:org_team_rm) }
+  it { routes_command('gh org team rm ops').to(:org_team_rm) }
+  it { routes_command('gh org team rm 42').to(:org_team_rm) }
+
+  # org_user_add routing
+  it { routes_command('gh org user add GrapeDuty heckmantest theckman').to(:org_user_add) }
+  it { routes_command('gh org user add heckmantest theckman').to(:org_user_add) }
+  it { routes_command('gh org user add GrapeDuty 42 theckman').to(:org_user_add) }
+  it { routes_command('gh org user add 42 theckman').to(:org_user_add) }
+
+  # org_user_rm routing
+  it { routes_command('gh org user rm GrapeDuty heckmantest theckman').to(:org_user_rm) }
+  it { routes_command('gh org user rm heckmantest theckman').to(:org_user_rm) }
+  it { routes_command('gh org user rm GrapeDuty 42 theckman').to(:org_user_rm) }
+  it { routes_command('gh org user rm 42 theckman').to(:org_user_rm) }
+
+  # org_eject_user routing
+  it { routes_command('gh org eject GrapeDuty theckman').to(:org_eject_user) }
+  it { routes_command('gh org eject theckman').to(:org_eject_user) }
+
   let(:github_org) { Lita::Handlers::GithubOrg.new('robot') }
+  let(:disabled_err) { 'Sorry, this function has either been disabled or not enabled in the config' }
 
   ####
   # Helper Methods
@@ -165,7 +188,7 @@ Name: HeckmanTest, Slug: heckmantest, ID: 42, Perms: push
 
       it 'should return the method disabled error' do
         send_command('gh org team add GrapeDuty name:"HeckmanTest" perms:pull')
-        expect(replies.last).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+        expect(replies.last).to eql disabled_err
       end
     end
 
@@ -226,7 +249,7 @@ Missing the perms option
 
       it 'should return the method disabled error' do
         send_command('gh org team rm GrapeDuty 42')
-        expect(replies.last).to eql 'Sorry, this function has either been disabled or not enabled in the config'
+        expect(replies.last).to eql disabled_err
       end
     end
 
@@ -246,6 +269,240 @@ Missing the perms option
         send_command('gh org team rm GrapeDuty 42')
         expect(replies.last).to eql "Something went wrong trying to delete the 'HeckmanTest' " \
                                     'team. Is Github having issues?'
+      end
+    end
+  end
+
+  describe '.org_eject_user' do
+    before do
+      @self_user = {
+        name: 'OfficerURL',
+        login: 'OfficerURL',
+        id: 8_525_060
+      }
+      @t_user = {
+        name: 'Tim Heckman',
+        login: 'theckman',
+        id: 787_332
+      }
+      @octo_obj = double('Octokit::Client', remove_organization_member: true)
+      @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
+      allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
+      allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
+      allow(github_org).to receive(:func_disabled?).and_return(false)
+      allow(github_org).to receive(:octo).and_return(@octo_obj)
+      allow(github_org).to receive(:cofig).and_return(@conf_obj)
+    end
+
+    context 'when all goes well' do
+      it 'should reply that the user was ejected' do
+        send_command('gh org eject GrapeDuty theckman')
+        expect(replies.last).to eql 'Ejected theckman out of GrapeDuty'
+      end
+    end
+
+    context 'when the method is disabled' do
+      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        send_command('gh org eject GrapeDuty theckman')
+        expect(replies.last).to eql disabled_err
+      end
+    end
+
+    context 'when the user is the same user' do
+      before { allow(@octo_obj).to receive(:user).with('OfficerURL').and_return(@self_user) }
+
+      it 'should return the gtfo error message' do
+        send_command('gh org eject GrapeDuty OfficerURL')
+        expect(replies.last).to eql "No...\n\nಠ_ಠ"
+      end
+    end
+
+    context 'when the user is not found' do
+      before { allow(@octo_obj).to receive(:user).with('theckman').and_raise(Octokit::NotFound.new) }
+
+      it 'should reply with the user not found message' do
+        send_command('gh org eject GrapeDuty theckman')
+        expect(replies.last).to eql 'Unable to find the GitHub user theckman'
+      end
+    end
+
+    context 'when the Octokit client call bombs' do
+      before { allow(@octo_obj).to receive(:remove_organization_member).and_raise(Octokit::NotFound.new) }
+
+      it 'should return the *boom* error' do
+        send_command('gh org eject GrapeDuty theckman')
+        expect(replies.last).to eql 'I had a problem :( ... Octokit::NotFound'
+      end
+    end
+
+    context 'when the action fails' do
+      before { allow(@octo_obj).to receive(:remove_organization_member).and_return(false) }
+
+      it 'should respond with the failure message' do
+        send_command('gh org eject GrapeDuty theckman')
+        expect(replies.last).to eql 'Failed to eject the user from the organization for an unknown reason'
+      end
+    end
+  end
+
+  describe '.org_user_add' do
+    before do
+      @self_user = {
+        name: 'OfficerURL',
+        login: 'OfficerURL',
+        id: 8_525_060
+      }
+      @t_user = {
+        name: 'Tim Heckman',
+        login: 'theckman',
+        id: 787_332
+      }
+      @team = {
+        name: 'HeckmanTest',
+        id: 42,
+        slug: 'heckmantest'
+      }
+      @octo_obj = double('Octokit::Client', team: @team, add_team_membership: true)
+      @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
+      allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
+      allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
+      allow(github_org).to receive(:func_disabled?).and_return(false)
+      allow(github_org).to receive(:octo).and_return(@octo_obj)
+      allow(github_org).to receive(:cofig).and_return(@conf_obj)
+      allow(github_org).to receive(:team_id).and_return(42)
+    end
+
+    context 'when all goes well' do
+      it 'should respond with a successful add' do
+        send_command('gh org user add GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql "theckman has been added to the 'GrapeDuty/HeckmanTest' (heckmantest) team"
+      end
+    end
+
+    context 'when the method is disabled' do
+      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        send_command('gh org user add GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql disabled_err
+      end
+    end
+
+    context 'when the user is the same user' do
+      before { allow(@octo_obj).to receive(:user).with('OfficerURL').and_return(@self_user) }
+
+      it 'should return the gtfo error message' do
+        send_command('gh org user add GrapeDuty heckmantest OfficerURL')
+        expect(replies.last).to eql "No...\n\nಠ_ಠ"
+      end
+    end
+
+    context 'when the user is not found' do
+      before { allow(@octo_obj).to receive(:user).with('theckman').and_raise(Octokit::NotFound.new) }
+
+      it 'should reply with the user not found message' do
+        send_command('gh org user add GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'Unable to find the GitHub user theckman'
+      end
+    end
+
+    context 'when the team is not found' do
+      before { allow(@octo_obj).to receive(:team).with(42).and_raise(Octokit::NotFound.new) }
+
+      it 'should reply with the team not found message' do
+        send_command('gh org user add GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'Unable to match any teams based on: heckmantest'
+      end
+    end
+
+    context 'when an error is hit adding the team membership' do
+      before { allow(@octo_obj).to receive(:add_team_membership).with(42, 'theckman').and_raise(StandardError.new) }
+
+      it 'should reply with the *boom* message' do
+        send_command('gh org user add GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'I had a problem :( ... StandardError'
+      end
+    end
+  end
+
+  describe '.org_user_rm' do
+    before do
+      @self_user = {
+        name: 'OfficerURL',
+        login: 'OfficerURL',
+        id: 8_525_060
+      }
+      @t_user = {
+        name: 'Tim Heckman',
+        login: 'theckman',
+        id: 787_332
+      }
+      @team = {
+        name: 'HeckmanTest',
+        id: 42,
+        slug: 'heckmantest'
+      }
+      @octo_obj = double('Octokit::Client', team: @team, remove_team_member: true)
+      @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
+      allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
+      allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
+      allow(github_org).to receive(:func_disabled?).and_return(false)
+      allow(github_org).to receive(:octo).and_return(@octo_obj)
+      allow(github_org).to receive(:cofig).and_return(@conf_obj)
+      allow(github_org).to receive(:team_id).and_return(42)
+    end
+
+    context 'when all goes well' do
+      it 'should respond with a successful removal' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql "theckman has been removed from the 'GrapeDuty/HeckmanTest' (heckmantest) team"
+      end
+    end
+
+    context 'when the method is disabled' do
+      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+
+      it 'should return the method disabled error' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql disabled_err
+      end
+    end
+
+    context 'when the user is the same user' do
+      before { allow(@octo_obj).to receive(:user).with('OfficerURL').and_return(@self_user) }
+
+      it 'should return the gtfo error message' do
+        send_command('gh org user rm GrapeDuty heckmantest OfficerURL')
+        expect(replies.last).to eql "No...\n\nಠ_ಠ"
+      end
+    end
+
+    context 'when the user is not found' do
+      before { allow(@octo_obj).to receive(:user).with('theckman').and_raise(Octokit::NotFound.new) }
+
+      it 'should reply with the user not found message' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'Unable to find the GitHub user theckman'
+      end
+    end
+
+    context 'when the team is not found' do
+      before { allow(@octo_obj).to receive(:team).with(42).and_raise(Octokit::NotFound.new) }
+
+      it 'should reply with the team not found message' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'Unable to match any teams based on: heckmantest'
+      end
+    end
+
+    context 'when an error is hit adding the team membership' do
+      before { allow(@octo_obj).to receive(:remove_team_member).with(42, 'theckman').and_raise(StandardError.new) }
+
+      it 'should reply with the *boom* message' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql 'I had a problem :( ... StandardError'
       end
     end
   end

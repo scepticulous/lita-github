@@ -68,6 +68,42 @@ module Lita
         }
       )
 
+      # rubocop:disable Metrics/LineLength
+      route(
+        /#{LitaGithub::R::A_REG}org\s+?user\s+?add(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<team>\s?[a-zA-Z0-9_\-]+)\s+?(?<username>[a-zA-Z0-9_\-]+)/,
+        :org_user_add,
+        command: true,
+        # confirmation: { allow_self: false },
+        help: {
+          'gh org user add PagerDuty everyone theckman' => 'add the user theckman to the PagerDuty/everyone team -- this requires confirmation from another user. NOTE: This will add the member to the organization if they are not already!!',
+          'gh org user add PagerDuty 42 theckman' => "same as above, except with the team's ID instead of the slug"
+        }
+      )
+
+      route(
+        /#{LitaGithub::R::A_REG}org\s+?user\s+?rm(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<team>\s?[a-zA-Z0-9_\-]+)\s+?(?<username>[a-zA-Z0-9_\-]+)/,
+        :org_user_rm,
+        comamnd: true,
+        # confirmation: { allow_self: false },
+        help: {
+          'gh org team rm PagerDuty everyone theckman' => 'remove the user theckman from the PagerDuty/everyone team, if this is their last team will remove them from the org. Requires confirmation from another user.',
+          'gh org team rm PagerDuty 42 theckman' => "same as above, except with the team's ID instead of the slug"
+        }
+      )
+      # rubocop:enable Metrics/LineLength
+
+      route(
+        /#{LitaGithub::R::A_REG}org\s+?eject(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<username>\s+?[a-zA-Z0-9_\-]+)/,
+        :org_eject_user,
+        command: true,
+        # confirmation: { allow_self: false },
+        help: {
+          'gh org eject PagerDuty theckman' => 'forcibly removes the user from all groups in the organization -- ' \
+                                               'this is meant for someone leaving the organization. Requires ' \
+                                               'confirmation from another user.'
+        }
+      )
+
       def org_teams_list(response)
         md = response.match_data
         org = md[:org].nil? ? config.default_org : organization(md[:org].strip)
@@ -128,6 +164,101 @@ module Lita
           response.reply(t('org_team_rm.pass', t.to_h))
         else
           response.reply(t('org_team_rm.fail', t.to_h))
+        end
+      end
+
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
+      def org_user_add(response)
+        return response.reply(t('method_disabled')) if func_disabled?(__method__)
+
+        md = response.match_data
+        org, team, username = [organization(md['org'].strip), md['team'].strip, md['username']]
+
+        begin
+          user_id = octo.user(username)[:id]
+        rescue Octokit::NotFound
+          return response.reply(t('user_not_found', n: username))
+        end
+
+        return response.reply(t('nope')) if octo.user[:id] == user_id
+
+        begin
+          team_obj = octo.team(team_id(team, org))
+        rescue Octokit::NotFound
+          return response.reply(t('team_not_found', team: team))
+        end
+
+        begin
+          resp = octo.add_team_membership(team_obj[:id], username)
+        rescue StandardError => e
+          return response.reply(t('boom', m: e.message))
+        end
+
+        if resp
+          response.reply(t('org_user_add.added', u: username, o: org, t: team_obj[:name], s: team_obj[:slug]))
+        else
+          response.reply(t('org_user_add.failed', t: team_obj[:name]))
+        end
+      end
+
+      def org_user_rm(response)
+        return response.reply(t('method_disabled')) if func_disabled?(__method__)
+        md = response.match_data
+        org, team, username = [organization(md['org'].strip), md['team'].strip, md['username']]
+
+        begin
+          user_id = octo.user(username)[:id]
+        rescue Octokit::NotFound
+          return response.reply(t('user_not_found', n: username))
+        end
+
+        return response.reply(t('nope')) if octo.user[:id] == user_id
+
+        begin
+          team = octo.team(team_id(team, org))
+        rescue Octokit::NotFound
+          return response.reply(t('team_not_found', team: team))
+        end
+
+        begin
+          resp = octo.remove_team_member(team[:id], username)
+        rescue StandardError => e
+          return response.reply(t('boom', m: e.message))
+        end
+
+        if resp
+          response.reply(t('org_user_rm.removed', u: username, o: org, t: team[:name], s: team[:slug]))
+        else
+          response.reply(t('org_user_rm.failed'), t: team[:name])
+        end
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
+
+      def org_eject_user(response)
+        return response.reply(t('method_disabled')) if func_disabled?(__method__)
+        md = response.match_data
+        org, username = [organization(md['org'].strip), md['username'].strip]
+
+        begin
+          user_id = octo.user(username)[:id]
+        rescue Octokit::NotFound
+          return response.reply(t('user_not_found', n: username))
+        end
+
+        return response.reply(t('nope')) if octo.user[:id] == user_id
+
+        begin
+          resp = octo.remove_organization_member(org, username)
+        rescue StandardError => e
+          return response.reply(t('boom', m: e.message))
+        end
+
+        if resp
+          response.reply(t('org_eject_user.ejected', user: username, org: org))
+        else
+          response.reply(t('org_eject_user.failed'))
         end
       end
 
