@@ -129,7 +129,7 @@ module Lita
       def org_team_add(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
 
-        opts = e_opts_parse(response.message.body)
+        opts = opts_parse(response.message.body)
         vo = validate_team_add_opts(opts)
         return response.reply(vo[:msg]) unless vo[:success]
 
