@@ -27,7 +27,7 @@ module LitaGithub
     # @param value [String] the value to see if it should be an Integer
     # @return [Integer] if the String <tt>value</tt> looks like an Integer (<tt>/^\d+$/</tt>), return it as one
     # @return [String] if the String <tt>value</tt> is not an Integer, return as is
-    def to_i_if_number(value)
+    def to_i_if_numeric(value)
       /^\d+$/.match(value) ? value.to_i : value
     end
 
@@ -59,7 +59,7 @@ module LitaGithub
         #   do nothing
         v = v.slice!(1, (v.length - 2)) if %w(' ").include?(v.slice(0))
 
-        o[k] = to_i_if_number(v)
+        o[k] = to_i_if_numeric(v)
       end
       o
     end

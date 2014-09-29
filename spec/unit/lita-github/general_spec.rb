@@ -35,15 +35,15 @@ describe LitaGithub::General do
     end
   end
 
-  describe '.to_i_if_number' do
+  describe '.to_i_if_numeric' do
     context 'when value is a number' do
-      subject { to_i_if_number('42') }
+      subject { to_i_if_numeric('42') }
       it { should eql 42 }
     end
 
     context 'when value is not a number' do
       let(:val) { 'hello' }
-      subject { to_i_if_number(val) }
+      subject { to_i_if_numeric(val) }
       it { should eql val }
     end
   end
