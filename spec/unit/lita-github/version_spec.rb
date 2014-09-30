@@ -18,23 +18,23 @@ describe LitaGithub do
   describe '::VERSION' do
     subject { LitaGithub::VERSION }
     it { should be_an_instance_of String }
-    it { should match(/\d+\.\d+\.\d+(?:\-[a-zA-Z0-9_\.\-])?/) }
+    it { should match(/\d+\.\d+\.\d+(?:\-[a-zA-Z0-9_\.\-]+)?/) }
   end
 
-  describe '::MAJ' do
-    subject { LitaGithub::MAJ }
+  describe '::MAJOR_VERSION' do
+    subject { LitaGithub::MAJOR_VERSION }
     it { should be_an_instance_of Fixnum }
     it { should be >= 0 }
   end
 
-  describe '::MIN' do
-    subject { LitaGithub::MIN }
+  describe '::MINOR_VERSION' do
+    subject { LitaGithub::MINOR_VERSION }
     it { should be_an_instance_of Fixnum }
     it { should be >= 0 }
   end
 
-  describe '::REV' do
-    subject { LitaGithub::REV }
+  describe '::REVISION' do
+    subject { LitaGithub::REVISION }
     it { should be_an_instance_of Fixnum }
     it { should be >= 0 }
   end
