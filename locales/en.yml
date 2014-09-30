@@ -55,7 +55,8 @@ en:
         exception: "An unexpected exception was hit during the GitHub API operation. Please make sure all arguments are proper and try again, or try checking the GitHub status (gh status)"
         not_found: "Pull request #%{pr} on %{org}/%{repo} not found"
         pr_info:
-          header: "%{repo} #%{number}: %{title} :: %{url}\n"
+          header: "%{repo} #%{number}: '%{title}' :: %{url}\n"
+          header_long: "%{repo} #%{number}: '%{title}' opened by %{u} :: %{url}\n"
           status: "Opened By: %{user} | State: %{state_str} | Build: %{build_status}"
           merged: " | Merged By: %{merged_by}\n"
           mergeable: " | Mergeable: %{mergeable}\n"
@@ -94,3 +95,14 @@ en:
         org_user_add:
           added: "%{u} has been added to the '%{o}/%{t}' (%{s}) team"
           failed: "Failed to add the user to the '%{t}' team for some unknown reason"
+      github_issues:
+        repo_not_found: "That repo (%{repo}) was not found"
+        boom: "I had a problem :( ... %{m}"
+        issues_list:
+          none: "There are no open issues for %{r}"
+          header: "Showing %{n} issue(s) for %{r}\n"
+          item: "%{r} #%{number}: '%{title}' opened by %{u} :: %{html_url}\n"
+          val_states: "Issues can be one of the following states: 'open', 'closed', or 'all'\n"
+          val_sort: "Issues can be sorted by one of the following: 'created', 'updated', 'comments'\n"
+          val_direction: "Issues can be ordered either 'asc' (ascending) or 'desc' (descending)\n"
+          invalid_opts: "An invalid option was provided, here's the error from Octokit:\n%{m}"

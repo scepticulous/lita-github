@@ -216,7 +216,7 @@ module Lita
       end
 
       def list_line(pr, full_name)
-        t('pr_info.header', build_pr_header!({}, pr).merge(repo: full_name))
+        t('pr_info.header_long', build_pr_header!({}, pr).merge(repo: full_name, u: pr[:user][:login]))
       end
     end
 

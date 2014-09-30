@@ -1,4 +1,18 @@
 # -*- coding: UTF-8 -*-
+#
+# Copyright 2014 PagerDuty, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 require 'spec_helper'
 
@@ -378,12 +392,12 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
   end
 
   describe '.list_line' do
-    let(:pr) { { title: 'Test', number: 42, html_url: 'nothtml' } }
+    let(:pr) { { title: 'Test', number: 42, html_url: 'nothtml', user: { login: 'theckman' } } }
     let(:full_name) { 'GrapeDuty/lita-test' }
 
     it 'should return a PR header' do
       l = github_pr.send(:list_line, pr, full_name)
-      expect(l).to eql "GrapeDuty/lita-test #42: Test :: nothtml\n"
+      expect(l).to eql "GrapeDuty/lita-test #42: 'Test' opened by theckman :: nothtml\n"
     end
   end
 
@@ -436,7 +450,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should reply with the expeced output' do
-        r = 'GrapeDuty/lita-test #42: Test Pull Request (Not Real) :: ' \
+        r = "GrapeDuty/lita-test #42: 'Test Pull Request (Not Real)' :: " \
               "https://github.com/GrapeDuty/lita-test/pulls/42\n" \
               "Opened By: theckman (Tim Heckman) | State: Open | Build: success | Mergeable: true\n" \
               'Head: 1234567 | Commits: 1 (+42/-0) :: ' \
@@ -463,7 +477,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       end
 
       it 'should reply with the expeced output' do
-        r = 'GrapeDuty/lita-test #42: Test Pull Request (Not Real) :: ' \
+        r = "GrapeDuty/lita-test #42: 'Test Pull Request (Not Real)' :: " \
               "https://github.com/GrapeDuty/lita-test/pulls/42\n" \
               'Opened By: theckman (Tim Heckman) | State: Merged | Build: success | ' \
               "Merged By: theckman (Tim Heckman)\n" \
@@ -589,8 +603,8 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     context 'when there are less than 20 prs' do
       before do
         pr = [
-          { title: 'Test2', number: 84, html_url: 'nohtmlurl' },
-          { title: 'Test1', number: 42, html_url: 'htmlurl' }
+          { title: 'Test2', number: 84, html_url: 'nohtmlurl', user: { login: 'theckman' } },
+          { title: 'Test1', number: 42, html_url: 'htmlurl', user: { login: 'theckman' } }
         ]
         octo_obj = double('Octokit::Client', pull_requests: pr)
         allow(github_pr).to receive(:octo).and_return(octo_obj)
@@ -598,35 +612,35 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
 
       it 'should reply with the PRs' do
         send_command("gh pr list #{github_org}/#{github_repo}")
-        expect(replies.last).to eql "GrapeDuty/lita-test #84: Test2 :: nohtmlurl\n" \
-                                    "GrapeDuty/lita-test #42: Test1 :: htmlurl\n"
+        expect(replies.last).to eql "GrapeDuty/lita-test #84: 'Test2' opened by theckman :: nohtmlurl\n" \
+                                    "GrapeDuty/lita-test #42: 'Test1' opened by theckman :: htmlurl\n"
       end
     end
 
     context 'when there are more than 20 prs' do
       before do
         pr = [
-          { title: 'Test21', number: 84, html_url: 'xxx' },
-          { title: 'Test20', number: 83, html_url: 'xxx' },
-          { title: 'Test19', number: 82, html_url: 'xxx' },
-          { title: 'Test18', number: 80, html_url: 'xxx' },
-          { title: 'Test17', number: 78, html_url: 'xxx' },
-          { title: 'Test16', number: 74, html_url: 'xxx' },
-          { title: 'Test15', number: 68, html_url: 'xxx' },
-          { title: 'Test14', number: 66, html_url: 'xxx' },
-          { title: 'Test13', number: 64, html_url: 'xxx' },
-          { title: 'Test12', number: 55, html_url: 'xxx' },
-          { title: 'Test11', number: 52, html_url: 'xxx' },
-          { title: 'Test10', number: 51, html_url: 'xxx' },
-          { title: 'Test9', number: 50, html_url: 'xxx' },
-          { title: 'Test8', number: 49, html_url: 'xxx' },
-          { title: 'Test7', number: 48, html_url: 'xxx' },
-          { title: 'Test6', number: 47, html_url: 'xxx' },
-          { title: 'Test5', number: 46, html_url: 'xxx' },
-          { title: 'Test4', number: 45, html_url: 'xxx' },
-          { title: 'Test3', number: 44, html_url: 'xxx' },
-          { title: 'Test2', number: 43, html_url: 'xxx' },
-          { title: 'Test1', number: 42, html_url: 'xxx' }
+          { title: 'Test21', number: 84, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test20', number: 83, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test19', number: 82, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test18', number: 80, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test17', number: 78, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test16', number: 74, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test15', number: 68, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test14', number: 66, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test13', number: 64, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test12', number: 55, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test11', number: 52, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test10', number: 51, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test9', number: 50, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test8', number: 49, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test7', number: 48, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test6', number: 47, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test5', number: 46, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test4', number: 45, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test3', number: 44, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test2', number: 43, html_url: 'xxx', user: { login: 'theckman' } },
+          { title: 'Test1', number: 42, html_url: 'xxx', user: { login: 'theckman' } }
         ]
         octo_obj = double('Octokit::Client', pull_requests: pr)
         allow(github_pr).to receive(:octo).and_return(octo_obj)
@@ -636,27 +650,27 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
         send_command("gh pr list #{github_org}/#{github_repo}")
         expect(replies.last)
           .to eql "You have more than 20 open pull requests :(! Here are the ten newest oldest:
-GrapeDuty/lita-test #84: Test21 :: xxx
-GrapeDuty/lita-test #83: Test20 :: xxx
-GrapeDuty/lita-test #82: Test19 :: xxx
-GrapeDuty/lita-test #80: Test18 :: xxx
-GrapeDuty/lita-test #78: Test17 :: xxx
-GrapeDuty/lita-test #74: Test16 :: xxx
-GrapeDuty/lita-test #68: Test15 :: xxx
-GrapeDuty/lita-test #66: Test14 :: xxx
-GrapeDuty/lita-test #64: Test13 :: xxx
-GrapeDuty/lita-test #55: Test12 :: xxx
+GrapeDuty/lita-test #84: 'Test21' opened by theckman :: xxx
+GrapeDuty/lita-test #83: 'Test20' opened by theckman :: xxx
+GrapeDuty/lita-test #82: 'Test19' opened by theckman :: xxx
+GrapeDuty/lita-test #80: 'Test18' opened by theckman :: xxx
+GrapeDuty/lita-test #78: 'Test17' opened by theckman :: xxx
+GrapeDuty/lita-test #74: 'Test16' opened by theckman :: xxx
+GrapeDuty/lita-test #68: 'Test15' opened by theckman :: xxx
+GrapeDuty/lita-test #66: 'Test14' opened by theckman :: xxx
+GrapeDuty/lita-test #64: 'Test13' opened by theckman :: xxx
+GrapeDuty/lita-test #55: 'Test12' opened by theckman :: xxx
 ----
-GrapeDuty/lita-test #51: Test10 :: xxx
-GrapeDuty/lita-test #50: Test9 :: xxx
-GrapeDuty/lita-test #49: Test8 :: xxx
-GrapeDuty/lita-test #48: Test7 :: xxx
-GrapeDuty/lita-test #47: Test6 :: xxx
-GrapeDuty/lita-test #46: Test5 :: xxx
-GrapeDuty/lita-test #45: Test4 :: xxx
-GrapeDuty/lita-test #44: Test3 :: xxx
-GrapeDuty/lita-test #43: Test2 :: xxx
-GrapeDuty/lita-test #42: Test1 :: xxx
+GrapeDuty/lita-test #51: 'Test10' opened by theckman :: xxx
+GrapeDuty/lita-test #50: 'Test9' opened by theckman :: xxx
+GrapeDuty/lita-test #49: 'Test8' opened by theckman :: xxx
+GrapeDuty/lita-test #48: 'Test7' opened by theckman :: xxx
+GrapeDuty/lita-test #47: 'Test6' opened by theckman :: xxx
+GrapeDuty/lita-test #46: 'Test5' opened by theckman :: xxx
+GrapeDuty/lita-test #45: 'Test4' opened by theckman :: xxx
+GrapeDuty/lita-test #44: 'Test3' opened by theckman :: xxx
+GrapeDuty/lita-test #43: 'Test2' opened by theckman :: xxx
+GrapeDuty/lita-test #42: 'Test1' opened by theckman :: xxx
 "
       end
     end

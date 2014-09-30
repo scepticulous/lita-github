@@ -21,14 +21,40 @@ describe LitaGithub::General do
 
   describe '.opts_parse' do
     it 'should find the valid options' do
-      o = %q( private:true team:heckman bacon:always bacon:sometimes string1:"something here" string2:'something else')
+      o = %q( private:true team:heckman Bacon:always bacon:sometimes string1:"something here" string2:'something else')
       co = opts_parse(o)
       expect(co).to be_an_instance_of Hash
+      expect(co.key?(:Bacon)).to be_falsey
+      expect(co.key?(:bacon)).to be_truthy
+      expect(co[:bacon]).to eql 'always' # of course it's always
+      expect(co[:bacon]).to_not eql 'sometimes'
       expect(co[:private]).to eql 'true'
       expect(co[:team]).to eql 'heckman'
-      expect(co[:bacon]).to eql 'always' # of course it's always
       expect(co[:string1]).to eql 'something here'
       expect(co[:string2]).to eql 'something else'
+    end
+  end
+
+  describe '.to_i_if_numeric' do
+    context 'when value is a number' do
+      subject { to_i_if_numeric('42') }
+      it { should eql 42 }
+    end
+
+    context 'when value is not a number' do
+      let(:val) { 'hello' }
+      subject { to_i_if_numeric(val) }
+      it { should eql val }
+    end
+  end
+
+  describe '.symbolize_opt_key' do
+    it 'should return an Array with the downcased/symblized key' do
+      kv = %w(Hello! ohai)
+      a = symbolize_opt_key(*kv)
+      expect(a).to be_an_instance_of Array
+      expect(a[0]).to eql kv[0].downcase.to_sym
+      expect(a[1]).to eql kv[1]
     end
   end
 end
