@@ -230,7 +230,7 @@ module Lita
         if resp
           response.reply(t('org_user_rm.removed', u: username, o: org, t: team[:name], s: team[:slug]))
         else
-          response.reply(t('org_user_rm.failed'), t: team[:name])
+          response.reply(t('org_user_rm.failed', t: team[:name]))
         end
       end
       # rubocop:enable Metrics/CyclomaticComplexity

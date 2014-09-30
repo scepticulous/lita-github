@@ -505,5 +505,14 @@ Missing the perms option
         expect(replies.last).to eql 'I had a problem :( ... StandardError'
       end
     end
+
+    context 'when the Octokit method call succeeds, but GitHub fails to remove the user' do
+      before { allow(@octo_obj).to receive(:remove_team_member).with(42, 'theckman').and_return(false) }
+
+      it 'should reply with the failure message' do
+        send_command('gh org user rm GrapeDuty heckmantest theckman')
+        expect(replies.last).to eql "Failed to remove the user from the 'HeckmanTest' team for some unknown reason"
+      end
+    end
   end
 end
