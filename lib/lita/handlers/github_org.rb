@@ -71,9 +71,7 @@ module Lita
       # rubocop:disable Metrics/LineLength
       route(
         /#{LitaGithub::R::A_REG}org\s+?user\s+?add(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<team>\s?[a-zA-Z0-9_\-]+)\s+?(?<username>[a-zA-Z0-9_\-]+)/,
-        :org_user_add,
-        command: true,
-        # confirmation: { allow_self: false },
+        :org_user_add, command: true, confirmation: { allow_self: false },
         help: {
           'gh org user add PagerDuty everyone theckman' => 'add the user theckman to the PagerDuty/everyone team -- this requires confirmation from another user. NOTE: This will add the member to the organization if they are not already!!',
           'gh org user add PagerDuty 42 theckman' => "same as above, except with the team's ID instead of the slug"
@@ -82,9 +80,7 @@ module Lita
 
       route(
         /#{LitaGithub::R::A_REG}org\s+?user\s+?rm(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<team>\s?[a-zA-Z0-9_\-]+)\s+?(?<username>[a-zA-Z0-9_\-]+)/,
-        :org_user_rm,
-        comamnd: true,
-        # confirmation: { allow_self: false },
+        :org_user_rm, comamnd: true, confirmation: { allow_self: false },
         help: {
           'gh org team rm PagerDuty everyone theckman' => 'remove the user theckman from the PagerDuty/everyone team, if this is their last team will remove them from the org. Requires confirmation from another user.',
           'gh org team rm PagerDuty 42 theckman' => "same as above, except with the team's ID instead of the slug"
@@ -94,9 +90,7 @@ module Lita
 
       route(
         /#{LitaGithub::R::A_REG}org\s+?eject(?<org>\s+?[a-zA-Z0-9_\-]+)?(?<username>\s+?[a-zA-Z0-9_\-]+)/,
-        :org_eject_user,
-        command: true,
-        # confirmation: { allow_self: false },
+        :org_eject_user, command: true, confirmation: { allow_self: false },
         help: {
           'gh org eject PagerDuty theckman' => 'forcibly removes the user from all groups in the organization -- ' \
                                                'this is meant for someone leaving the organization. Requires ' \
