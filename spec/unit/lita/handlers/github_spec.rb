@@ -20,18 +20,18 @@ describe Lita::Handlers::Github, lita_handler: true do
   let(:github) { Lita::Handlers::Github.new('robot') }
 
   # status routing
-  it { routes_command('gh status').to(:status) }
-  it { routes_command('github status').to(:status) }
+  it { is_expected.to route_command('gh status').to(:status) }
+  it { is_expected.to route_command('github status').to(:status) }
 
   # version routing
-  it { routes_command('gh version').to(:version) }
+  it { is_expected.to route_command('gh version').to(:version) }
 
   # token routing
-  it { routes_command('gh token').to(:token_generate) }
+  it { is_expected.to route_command('gh token').to(:token_generate) }
 
   # whois routing
-  it { routes_command('gh whois theckman').to(:whois) }
-  it { routes_command('gh user theckman').to(:whois) }
+  it { is_expected.to route_command('gh whois theckman').to(:whois) }
+  it { is_expected.to route_command('gh user theckman').to(:whois) }
 
   describe '#default_config' do
     it 'should set default team to nil' do

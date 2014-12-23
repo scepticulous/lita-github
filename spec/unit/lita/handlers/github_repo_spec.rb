@@ -18,57 +18,57 @@ require 'spec_helper'
 
 describe Lita::Handlers::GithubRepo, lita_handler: true do
   # repo_create command routing
-  it { routes_command('gh repo create GrapeDuty/lita-test').to(:repo_create) }
-  it { routes_command('gh repo new GrapeDuty/lita-test').to(:repo_create) }
-  it { routes_command('gh repo new lita-test').to(:repo_create) }
-  it { routes_command('gh repo new GrapeDuty/lita-test private:true team:heckman').to(:repo_create) }
-  it { routes_command('gh repo new GrapeDuty/lita-test private:true randomunparseabletext ').to(:repo_create) }
+  it { is_expected.to route_command('gh repo create GrapeDuty/lita-test').to(:repo_create) }
+  it { is_expected.to route_command('gh repo new GrapeDuty/lita-test').to(:repo_create) }
+  it { is_expected.to route_command('gh repo new lita-test').to(:repo_create) }
+  it { is_expected.to route_command('gh repo new GrapeDuty/lita-test private:true team:heckman').to(:repo_create) }
+  it { is_expected.to route_command('gh repo new GrapeDuty/lita-test private:true randomunparseabletext ').to(:repo_create) }
 
   # repo_delete command routing
-  it { routes_command('gh repo delete GrapeDuty/lita-test').to(:repo_delete) }
-  it { routes_command('gh repo delete lita-test').to(:repo_delete) }
+  it { is_expected.to route_command('gh repo delete GrapeDuty/lita-test').to(:repo_delete) }
+  it { is_expected.to route_command('gh repo delete lita-test').to(:repo_delete) }
 
   # repo_info command routing
-  it { routes_command('gh repo info GrapeDuty/lita-test').to(:repo_info) }
-  it { routes_command('gh repo info lita-test').to(:repo_info) }
+  it { is_expected.to route_command('gh repo info GrapeDuty/lita-test').to(:repo_info) }
+  it { is_expected.to route_command('gh repo info lita-test').to(:repo_info) }
 
   # repo_teams_list routing
-  it { routes_command('gh repo teams GrapeDuty/lita-test').to(:repo_teams_list) }
-  it { routes_command('gh repo team list GrapeDuty/lita-test').to(:repo_teams_list) }
-  it { routes_command('gh repo teams lita-test').to(:repo_teams_list) }
-  it { routes_command('gh repo team list lita-test').to(:repo_teams_list) }
+  it { is_expected.to route_command('gh repo teams GrapeDuty/lita-test').to(:repo_teams_list) }
+  it { is_expected.to route_command('gh repo team list GrapeDuty/lita-test').to(:repo_teams_list) }
+  it { is_expected.to route_command('gh repo teams lita-test').to(:repo_teams_list) }
+  it { is_expected.to route_command('gh repo team list lita-test').to(:repo_teams_list) }
 
   # repo_team_router routing
-  it { routes_command('gh repo team add everyone GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add everyone to GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add everyone lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add everyone to lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add 42 GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add 42 to GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add 42 lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team add 42 to lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm everyone GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm everyone to GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm everyone lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm everyone to lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm 42 GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm 42 to GrapeDuty/lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm 42 lita-test').to(:repo_team_router) }
-  it { routes_command('gh repo team rm 42 to lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add everyone GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add everyone to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add everyone lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add everyone to lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add 42 GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add 42 to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add 42 lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team add 42 to lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone to lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm 42 GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm 42 to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm 42 lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm 42 to lita-test').to(:repo_team_router) }
 
   # repo_update_router routing
   it do
-    routes_command(
+    is_expected.to route_command(
       'gh repo update homepage GrapeDuty/lita-test https://github.com/GrapeDuty/lita-test'
     ).to(:repo_update_router)
   end
   it do
-    routes_command(
+    is_expected.to route_command(
       'gh repo update homepage lita-test https://github.com/GrapeDuty/lita-test'
     ).to(:repo_update_router)
   end
-  it { routes_command('gh repo update description GrapeDuty/lita-test Some description here').to(:repo_update_router) }
-  it { routes_command('gh repo update description lita-test Some description here').to(:repo_update_router) }
+  it { is_expected.to route_command('gh repo update description GrapeDuty/lita-test Some description here').to(:repo_update_router) }
+  it { is_expected.to route_command('gh repo update description lita-test Some description here').to(:repo_update_router) }
 
   let(:github_repo) { Lita::Handlers::GithubRepo.new('robot') }
   let(:github_org) { 'GrapeDuty' }
