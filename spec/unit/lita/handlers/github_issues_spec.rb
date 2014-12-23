@@ -18,12 +18,12 @@ require 'spec_helper'
 
 describe Lita::Handlers::GithubIssues, lita_handler: true do
   # issues_list command routing
-  it { routes_command('gh issues GrapeDuty/lita-test').to(:issues_list) }
-  it { routes_command('gh issues lita-test').to(:issues_list) }
-  it { routes_command('gh issues lita-test key:value keys:"values"').to(:issues_list) }
-  it { routes_command('gh repo issues GrapeDuty/lita-test').to(:issues_list) }
-  it { routes_command('gh repo issues lita-test').to(:issues_list) }
-  it { routes_command('gh repo issues lita-test key:value keys:"values"').to(:issues_list) }
+  it { is_expected.to route_command('gh issues GrapeDuty/lita-test').to(:issues_list) }
+  it { is_expected.to route_command('gh issues lita-test').to(:issues_list) }
+  it { is_expected.to route_command('gh issues lita-test key:value keys:"values"').to(:issues_list) }
+  it { is_expected.to route_command('gh repo issues GrapeDuty/lita-test').to(:issues_list) }
+  it { is_expected.to route_command('gh repo issues lita-test').to(:issues_list) }
+  it { is_expected.to route_command('gh repo issues lita-test key:value keys:"values"').to(:issues_list) }
 
   let(:gh_org) { 'GapeDuty' }
   let(:gh_repo) { 'lita-test' }

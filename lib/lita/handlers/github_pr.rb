@@ -44,7 +44,9 @@ module Lita
 
       route(
         /(?:#{LitaGithub::R::A_REG}(?:pr merge|shipit)|shipit)\s+?#{LitaGithub::R::REPO_REGEX}\s+?#(?<pr>\d+?)$/,
-        :pr_merge, command: true, confirmation: true,
+        :pr_merge,
+        command: true,
+        confirmation: true,
         help: {
           'gh shipit PagerDuty/lita-github #42' => 'ship it!',
           'gh pr merge PagerDuty/lita-github #42' => 'ship it!',

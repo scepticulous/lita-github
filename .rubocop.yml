@@ -12,6 +12,8 @@ Metrics/LineLength:
   Max: 120
 Metrics/MethodLength:
   Max: 30
+Metrics/AbcSize:
+  Enabled: false
 
 # pending: https://github.com/bbatsov/rubocop/issues/1332
 Style/GuardClause:

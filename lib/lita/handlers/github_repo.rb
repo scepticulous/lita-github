@@ -51,7 +51,9 @@ module Lita
 
       route(
         /#{LitaGithub::R::A_REG}repo\s+?delete\s+?#{LitaGithub::R::REPO_REGEX}/,
-        :repo_delete, command: true, confirmation: true,
+        :repo_delete,
+        command: true,
+        confirmation: true,
         help: {
           'gh repo delete PagerDuty/lita-github' => 'Delete the PagerDuty/lita-github repo'
         }
@@ -79,7 +81,9 @@ module Lita
       # rubocop:disable Metrics/LineLength
       route(
         /#{LitaGithub::R::A_REG}repo\s+?team\s+?(?<action>add|rm)\s+?(?<team>[a-zA-Z0-9_\-]+?)(\s+?to)?\s+?#{LitaGithub::R::REPO_REGEX}/,
-        :repo_team_router, command: true, confirmation: true,
+        :repo_team_router,
+        command: true,
+        confirmation: true,
         help: {
           'gh repo team add everyone PagerDuty/lita-test' => 'add a team using slug to your repo',
           'gh repo team add 42 PagerDuty/lita-test' => 'add a team using ID to your repo',
@@ -90,7 +94,9 @@ module Lita
 
       route(
         /#{LitaGithub::R::A_REG}repo\s+update\s+?(?<field>description|homepage)\s+?#{LitaGithub::R::REPO_REGEX}\s+?(?<content>.*)$/,
-        :repo_update_router, command: true, confirmation: true,
+        :repo_update_router,
+        command: true,
+        confirmation: true,
         help: {
           'gh repo description PagerDuty/lita-github' => 'get the repo description'
         }

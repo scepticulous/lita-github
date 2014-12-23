@@ -18,6 +18,8 @@ require 'rspec'
 require 'lita/rspec'
 require 'codeclimate-test-reporter'
 
+Lita.version_3_compatibility_mode = false
+
 CodeClimate::TestReporter.start
 
 require 'lita-github'

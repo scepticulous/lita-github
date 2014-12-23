@@ -18,20 +18,20 @@ require 'spec_helper'
 
 describe Lita::Handlers::GithubPR, lita_handler: true do
   # pr_merge command routing
-  it { routes_command('gh shipit GrapeDuty/lita-test #42').to(:pr_merge) }
-  it { routes_command('gh shipit lita-test #42').to(:pr_merge) }
-  it { routes_command('gh pr merge lita-test #42').to(:pr_merge) }
-  it { routes_command('gh pr merge GrapeDuty/lita-test #42').to(:pr_merge) }
-  it { routes_command('shipit GrapeDuty/lita-test #42').to(:pr_merge) }
-  it { routes_command('shipit lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('gh shipit GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('gh shipit lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('gh pr merge lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('gh pr merge GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('shipit GrapeDuty/lita-test #42').to(:pr_merge) }
+  it { is_expected.to route_command('shipit lita-test #42').to(:pr_merge) }
 
   # pr_info command routing
-  it { routes_command('gh pr info GrapeDuty/lita-test #42').to(:pr_info) }
-  it { routes_command('gh pr info lita-test #42').to(:pr_info) }
+  it { is_expected.to route_command('gh pr info GrapeDuty/lita-test #42').to(:pr_info) }
+  it { is_expected.to route_command('gh pr info lita-test #42').to(:pr_info) }
 
   # pr_list command routing
-  it { routes_command('gh pr list GrapeDuty/lita-test').to(:pr_list) }
-  it { routes_command('gh pr list lita-test').to(:pr_list) }
+  it { is_expected.to route_command('gh pr list GrapeDuty/lita-test').to(:pr_list) }
+  it { is_expected.to route_command('gh pr list lita-test').to(:pr_list) }
 
   let(:github_pr) { Lita::Handlers::GithubPR.new('robot') }
   let(:github_org) { 'GrapeDuty' }

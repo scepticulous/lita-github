@@ -18,38 +18,38 @@ require 'spec_helper'
 
 describe Lita::Handlers::GithubOrg, lita_handler: true do
   # org_team_list routing
-  it { routes_command('gh teams PagerDuty').to(:org_teams_list) }
-  it { routes_command('gh org teams GrapeDuty').to(:org_teams_list) }
-  it { routes_command('gh org team list GrapeDuty').to(:org_teams_list) }
-  it { routes_command('gh teams').to(:org_teams_list) }
-  it { routes_command('gh org teams').to(:org_teams_list) }
-  it { routes_command('gh org team list').to(:org_teams_list) }
+  it { is_expected.to route_command('gh teams PagerDuty').to(:org_teams_list) }
+  it { is_expected.to route_command('gh org teams GrapeDuty').to(:org_teams_list) }
+  it { is_expected.to route_command('gh org team list GrapeDuty').to(:org_teams_list) }
+  it { is_expected.to route_command('gh teams').to(:org_teams_list) }
+  it { is_expected.to route_command('gh org teams').to(:org_teams_list) }
+  it { is_expected.to route_command('gh org team list').to(:org_teams_list) }
 
   # org_team_add routing
-  it { routes_command('gh org team add GrapeDuty name:"All Staff" perms:pull').to(:org_team_add) }
-  it { routes_command('gh org team add name:"All Staff" perms:pull').to(:org_team_add) }
+  it { is_expected.to route_command('gh org team add GrapeDuty name:"All Staff" perms:pull').to(:org_team_add) }
+  it { is_expected.to route_command('gh org team add name:"All Staff" perms:pull').to(:org_team_add) }
 
   # org_team_rm routing
-  it { routes_command('gh org team rm GrapeDuty ops').to(:org_team_rm) }
-  it { routes_command('gh org team rm GrapeDuty 42').to(:org_team_rm) }
-  it { routes_command('gh org team rm ops').to(:org_team_rm) }
-  it { routes_command('gh org team rm 42').to(:org_team_rm) }
+  it { is_expected.to route_command('gh org team rm GrapeDuty ops').to(:org_team_rm) }
+  it { is_expected.to route_command('gh org team rm GrapeDuty 42').to(:org_team_rm) }
+  it { is_expected.to route_command('gh org team rm ops').to(:org_team_rm) }
+  it { is_expected.to route_command('gh org team rm 42').to(:org_team_rm) }
 
   # org_user_add routing
-  it { routes_command('gh org user add GrapeDuty heckmantest theckman').to(:org_user_add) }
-  it { routes_command('gh org user add heckmantest theckman').to(:org_user_add) }
-  it { routes_command('gh org user add GrapeDuty 42 theckman').to(:org_user_add) }
-  it { routes_command('gh org user add 42 theckman').to(:org_user_add) }
+  it { is_expected.to route_command('gh org user add GrapeDuty heckmantest theckman').to(:org_user_add) }
+  it { is_expected.to route_command('gh org user add heckmantest theckman').to(:org_user_add) }
+  it { is_expected.to route_command('gh org user add GrapeDuty 42 theckman').to(:org_user_add) }
+  it { is_expected.to route_command('gh org user add 42 theckman').to(:org_user_add) }
 
   # org_user_rm routing
-  it { routes_command('gh org user rm GrapeDuty heckmantest theckman').to(:org_user_rm) }
-  it { routes_command('gh org user rm heckmantest theckman').to(:org_user_rm) }
-  it { routes_command('gh org user rm GrapeDuty 42 theckman').to(:org_user_rm) }
-  it { routes_command('gh org user rm 42 theckman').to(:org_user_rm) }
+  it { is_expected.to route_command('gh org user rm GrapeDuty heckmantest theckman').to(:org_user_rm) }
+  it { is_expected.to route_command('gh org user rm heckmantest theckman').to(:org_user_rm) }
+  it { is_expected.to route_command('gh org user rm GrapeDuty 42 theckman').to(:org_user_rm) }
+  it { is_expected.to route_command('gh org user rm 42 theckman').to(:org_user_rm) }
 
   # org_eject_user routing
-  it { routes_command('gh org eject GrapeDuty theckman').to(:org_eject_user) }
-  it { routes_command('gh org eject theckman').to(:org_eject_user) }
+  it { is_expected.to route_command('gh org eject GrapeDuty theckman').to(:org_eject_user) }
+  it { is_expected.to route_command('gh org eject theckman').to(:org_eject_user) }
 
   let(:github_org) { Lita::Handlers::GithubOrg.new('robot') }
   let(:disabled_err) { 'Sorry, this function has either been disabled or not enabled in the config' }
