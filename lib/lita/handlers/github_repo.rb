@@ -130,11 +130,11 @@ module Lita
       def repo_rename(response)
         return response.reply(t('method_disabled')) if func_disabled?(__method__)
         org, repo = repo_match(response.match_data)
-        new_repo_name = response.match_data['repo_name']
+        new_repo = response.match_data['repo_name']
 
         return response.reply(t('not_found', org: org, repo: repo)) unless repo?(rpo(org, repo))
 
-        response.reply(rename_repo(org, repo, new_repo_name))
+        response.reply(rename_repo(org, repo, new_repo))
       end
 
       def repo_delete(response)
@@ -328,14 +328,14 @@ module Lita
         reply
       end
 
-      def rename_repo(org, repo, new_repo_name)
+      def rename_repo(org, repo, new_repo)
         full_name = rpo(org, repo)
         reply = nil
         begin
-          octo.edit_repository(full_name, { :name => new_repo_name } )
+          octo.edit_repository(full_name, { :name => new_repo } )
         ensure
-          if repo?(rpo(org, new_repo_name))
-            reply = t('repo_rename.pass', org: org, repo: new_repo_name)
+          if repo?(rpo(org, new_repo))
+            reply = t('repo_rename.pass', org: org, old_repo: repo, new_repo: new_repo)
           else
             reply = t('repo_rename.fail', org: org, repo: repo)
           end
