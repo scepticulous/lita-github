@@ -74,7 +74,8 @@ module Lita
         command: true,
         confirmation: true,
         help: {
-          'gh repo rename PagerDuty/lita-github better-lita-github' => 'Rename the PagerDuty/lita-github repo to PagerDuty/better-lita-github'
+          'gh repo rename PagerDuty/lita-github better-lita-github' =>
+            'Rename the PagerDuty/lita-github repo to PagerDuty/better-lita-github'
         }
       )
 
@@ -332,7 +333,7 @@ module Lita
         full_name = rpo(org, repo)
         reply = nil
         begin
-          octo.edit_repository(full_name, { :name => new_repo } )
+          octo.edit_repository(full_name, name: new_repo)
         ensure
           if repo?(rpo(org, new_repo))
             reply = t('repo_rename.pass', org: org, old_repo: repo, new_repo: new_repo)
