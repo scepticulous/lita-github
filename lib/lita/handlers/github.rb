@@ -81,6 +81,7 @@ module Lita
 
         # Lita::Handlers::GithubRepo
         config.repo_create_enabled              = true
+        config.repo_rename_enabled              = true
         config.repo_delete_enabled              = false
         config.repo_team_add_enabled            = false
         config.repo_team_rm_enabled             = false
