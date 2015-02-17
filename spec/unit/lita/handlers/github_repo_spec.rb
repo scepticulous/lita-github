@@ -24,6 +24,10 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   it { is_expected.to route_command('gh repo new GrapeDuty/lita-test private:true team:heckman').to(:repo_create) }
   it { is_expected.to route_command('gh repo new GrapeDuty/lita-test private:true randomunparseabletext ').to(:repo_create) }
 
+  # repo_rename command routing
+  it { is_expected.to route_command('gh repo rename GrapeDuty/lita-test lita-test-2').to(:repo_rename) }
+  it { is_expected.to route_command('gh repo rename lita-test lita-test-2').to(:repo_rename) }
+
   # repo_delete command routing
   it { is_expected.to route_command('gh repo delete GrapeDuty/lita-test').to(:repo_delete) }
   it { is_expected.to route_command('gh repo delete lita-test').to(:repo_delete) }
@@ -299,6 +303,34 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       it 'should reply with failure message' do
         expect(github_repo.send(:delete_repo, github_org, 'lita-test'))
           .to eql 'Unable to delete GrapeDuty/lita-test'
+      end
+    end
+  end
+
+  describe '.rename_repo' do
+    before do
+      allow(github_repo).to receive(:octo).and_return(double('Octokit::Client', edit_repository: nil))
+    end
+
+    context 'when repo renamed' do
+      before do
+        allow(github_repo).to receive(:repo?).with("#{github_org}/better-lita-test").and_return(true)
+      end
+
+      it 'should confirm successful rename' do
+        expect(github_repo.send(:rename_repo, github_org, 'lita-test', 'better-lita-test'))
+          .to eql 'Renamed GrapeDuty/lita-test to GrapeDuty/better-lita-test'
+      end
+    end
+
+    context 'when repo not renamed' do
+      before do
+        allow(github_repo).to receive(:repo?).with("#{github_org}/better-lita-test").and_return(false)
+      end
+
+      it 'should reply with failure message' do
+        expect(github_repo.send(:rename_repo, github_org, 'lita-test', 'better-lita-test'))
+          .to eql 'Unable to rename GrapeDuty/lita-test'
       end
     end
   end
@@ -738,6 +770,41 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         expect(github_repo).to receive(:extrapolate_create_opts).and_return(@opts)
         send_command("gh repo create #{github_org}/lita-test")
         expect(replies.last).to eql 'hello from PAX prime!'
+      end
+    end
+  end
+
+  describe '.repo_rename' do
+    before do
+      allow(github_repo).to receive(:func_disabled?).and_return(false)
+      allow(github_repo).to receive(:rename_repo).and_return('hello there')
+      allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
+    end
+
+    it 'reply with the return from rename_repo()' do
+      send_command("gh repo rename #{github_org}/lita-test better-lita-test")
+      expect(replies.last).to eql 'hello there'
+    end
+
+    context 'when command disabled' do
+      before do
+        allow(github_repo).to receive(:func_disabled?).and_return(true)
+      end
+
+      it 'should no-op and say such if the command is disabled' do
+        send_command("gh repo rename #{github_org}/lita-test better-lita-test")
+        expect(replies.last).to eql disabled_reply
+      end
+    end
+
+    context 'when repo not found' do
+      before do
+        allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
+      end
+
+      it 'should no-op informing you that the repo is not there' do
+        send_command("gh repo rename #{github_org}/lita-test better-lita-test")
+        expect(replies.last).to eql 'That repo (GrapeDuty/lita-test) was not found'
       end
     end
   end

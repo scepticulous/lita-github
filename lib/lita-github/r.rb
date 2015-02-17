@@ -26,6 +26,9 @@ module LitaGithub
     #  key1:value key2:"value2" key3:'a better value'
     OPT_REGEX ||= /((?:\s+?[a-zA-Z0-9_]+?):(?:(?:".+?")|(?:'.+?')|(?:[a-zA-Z0-9_]+)))/
 
+    # regex matcher for a repo name (not including the org).
+    REPO_NAME_REGEX = '(?<repo_name>[a-zA-Z0-9_\-]+)'
+
     # regex matcher for: Org/repo
     REPO_REGEX = '(?:(?<org>[a-zA-Z0-9_\-]+)(?:\s+?)?\/)?(?:\s+?)?(?<repo>[a-zA-Z0-9_\-]+)'
   end

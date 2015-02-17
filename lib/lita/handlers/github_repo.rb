@@ -69,6 +69,17 @@ module Lita
       )
 
       route(
+        /#{LitaGithub::R::A_REG}repo\s+?rename\s+?#{LitaGithub::R::REPO_REGEX}\s+?#{LitaGithub::R::REPO_NAME_REGEX}/,
+        :repo_rename,
+        command: true,
+        confirmation: true,
+        help: {
+          'gh repo rename PagerDuty/lita-github better-lita-github' =>
+            'Rename the PagerDuty/lita-github repo to PagerDuty/better-lita-github'
+        }
+      )
+
+      route(
         /#{LitaGithub::R::A_REG}repo\s+?(teams|team\s+?list)\s+?#{LitaGithub::R::REPO_REGEX}/,
         :repo_teams_list,
         command: true,
@@ -115,6 +126,16 @@ module Lita
         opts = extrapolate_create_opts(opts_parse(response.message.body), org)
 
         response.reply(create_repo(org, repo, opts))
+      end
+
+      def repo_rename(response)
+        return response.reply(t('method_disabled')) if func_disabled?(__method__)
+        org, repo = repo_match(response.match_data)
+        new_repo = response.match_data['repo_name']
+
+        return response.reply(t('not_found', org: org, repo: repo)) unless repo?(rpo(org, repo))
+
+        response.reply(rename_repo(org, repo, new_repo))
       end
 
       def repo_delete(response)
@@ -303,6 +324,21 @@ module Lita
             reply = t('repo_create.pass', org: org, repo: repo, repo_url: repo_url)
           else
             reply = t('repo_create.fail', org: org, repo: repo)
+          end
+        end
+        reply
+      end
+
+      def rename_repo(org, repo, new_repo)
+        full_name = rpo(org, repo)
+        reply = nil
+        begin
+          octo.edit_repository(full_name, name: new_repo)
+        ensure
+          if repo?(rpo(org, new_repo))
+            reply = t('repo_rename.pass', org: org, old_repo: repo, new_repo: new_repo)
+          else
+            reply = t('repo_rename.fail', org: org, repo: repo)
           end
         end
         reply

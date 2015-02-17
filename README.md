@@ -59,6 +59,8 @@ Here is the current functionality:
 * `!gh repo delete PagerDuty/lita-github`
   * Deletes the repo you specify, requires confirmation before doing so
   * **Note:** This method is disabled by default, you need to enable it by setting `config.handlers.github.repo_delete_enabled = true` in your configuration file
+* `!gh repo rename PagerDuty/lita-github better-lita-github`
+  * Renames the repo you specify -- requires confirmation
 * `!gh repo teams PagerDuty/lita-github`
   * list all of the teams currently attached to a repo
 * `!gh repo team add <TEAM_ID|TEAM_SLUG> PagerDuty/lita-github`

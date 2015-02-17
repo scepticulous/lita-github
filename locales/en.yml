@@ -26,6 +26,9 @@ en:
           pass: "Created %{org}/%{repo}: %{repo_url}"
           fail: "Unable to create %{org}/%{repo}"
           exists: "Unable to create %{org}/%{repo} as it already exists"
+        repo_rename:
+          pass: "Renamed %{org}/%{old_repo} to %{org}/%{new_repo}"
+          fail: "Unable to rename %{org}/%{repo}"
         repo_delete:
           pass: "Deleted %{org}/%{repo}"
           fail: "Unable to delete %{org}/%{repo}"
