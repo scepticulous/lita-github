@@ -53,8 +53,10 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   it { is_expected.to route_command('gh repo team add 42 to lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm everyone GrapeDuty/lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm everyone to GrapeDuty/lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone from GrapeDuty/lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm everyone lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm everyone to lita-test').to(:repo_team_router) }
+  it { is_expected.to route_command('gh repo team rm everyone from lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm 42 GrapeDuty/lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm 42 to GrapeDuty/lita-test').to(:repo_team_router) }
   it { is_expected.to route_command('gh repo team rm 42 lita-test').to(:repo_team_router) }
