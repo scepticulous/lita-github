@@ -91,7 +91,7 @@ module Lita
 
       # rubocop:disable Metrics/LineLength
       route(
-        /#{LitaGithub::R::A_REG}repo\s+?team\s+?(?<action>add|rm)\s+?(?<team>[a-zA-Z0-9_\-]+?)(\s+?to)?\s+?#{LitaGithub::R::REPO_REGEX}/,
+        /#{LitaGithub::R::A_REG}repo\s+?team\s+?(?<action>add|rm)\s+?(?<team>[a-zA-Z0-9_\-]+?)(\s+?(?:to|from))?\s+?#{LitaGithub::R::REPO_REGEX}/,
         :repo_team_router,
         command: true,
         confirmation: true,
