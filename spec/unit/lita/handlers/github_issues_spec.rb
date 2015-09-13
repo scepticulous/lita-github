@@ -97,9 +97,9 @@ describe Lita::Handlers::GithubIssues, lita_handler: true do
         }
       ]
       @octo_obj = double('Octokit::Client', list_issues: issues)
-      allow(github_issues).to receive(:octo).and_return(@octo_obj)
-      allow(github_issues).to receive(:repo?).and_return(true)
-      allow(github_issues).to receive(:validate_list_opts).and_return('')
+      allow_any_instance_of(Lita::Handlers::GithubIssues).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubIssues).to receive(:repo?).and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubIssues).to receive(:validate_list_opts).and_return('')
     end
 
     context 'when all goes well' do
@@ -123,7 +123,9 @@ GrapeDuty/lita-test #84: 'YZYZYZYZ' opened by theckman :: https://github.com/Gra
     end
 
     context 'when there is an option that fails validation' do
-      before { allow(github_issues).to receive(:validate_list_opts).and_return('sadpanda') }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubIssues).to receive(:validate_list_opts).and_return('sadpanda')
+      end
 
       it 'should reply with the response from .validate_list_opts' do
         send_command('gh issues GrapeDuty/lita-test')
@@ -132,7 +134,9 @@ GrapeDuty/lita-test #84: 'YZYZYZYZ' opened by theckman :: https://github.com/Gra
     end
 
     context 'when the repo is not found' do
-      before { allow(github_issues).to receive(:repo?).and_return(false) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubIssues).to receive(:repo?).and_return(false)
+      end
 
       it 'should reply with response indicating repo not found' do
         send_command('gh issues GrapeDuty/lita-test')
@@ -141,7 +145,9 @@ GrapeDuty/lita-test #84: 'YZYZYZYZ' opened by theckman :: https://github.com/Gra
     end
 
     context 'when an option passes validation, but fails from GitHub' do
-      before { allow(@octo_obj).to receive(:list_issues).and_raise(Octokit::UnprocessableEntity.new) }
+      before do
+        allow(@octo_obj).to receive(:list_issues).and_raise(Octokit::UnprocessableEntity.new)
+      end
 
       it 'should reply indicating an issue was hit and include the exception message' do
         send_command('gh issues GrapeDuty/lita-test')
@@ -151,7 +157,9 @@ Octokit::UnprocessableEntity"
     end
 
     context 'when there is a general error when calling GitHub' do
-      before { allow(@octo_obj).to receive(:list_issues).and_raise(StandardError.new) }
+      before do
+        allow(@octo_obj).to receive(:list_issues).and_raise(StandardError.new)
+      end
 
       it 'should reply indicating an issue was hit and include the exception message' do
         send_command('gh issues GrapeDuty/lita-test')

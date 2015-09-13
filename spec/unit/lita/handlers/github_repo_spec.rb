@@ -562,10 +562,10 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
       @response = double('Lita::Response', match_data: match_data)
       @octo_obj = double('Octokit::Client', edit_repository: { description: 'oh hello' })
-      allow(github_repo).to receive(:config).and_return(conf_obj)
-      allow(github_repo).to receive(:octo).and_return(@octo_obj)
-      allow(github_repo).to receive(:func_disabled?).and_return(false)
-      allow(github_repo).to receive(:repo?).and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:config).and_return(conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:octo).and_return(@octo_obj)
     end
 
     context 'when valid inputs provided, and all things work out' do
@@ -576,7 +576,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
 
     context 'when function disabled' do
-      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh repo update description lita-test A new description!')
@@ -585,7 +587,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
 
     context 'when repo not found' do
-      before { allow(github_repo).to receive(:repo?).and_return(false) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).and_return(false)
+      end
 
       it 'should return the repo not found error' do
         send_command('gh repo update description lita-test A new description!')
@@ -612,10 +616,10 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
       @response = double('Lita::Response', match_data: match_data)
       @octo_obj = double('Octokit::Client', edit_repository: { homepage: 'https://test.it' })
-      allow(github_repo).to receive(:config).and_return(conf_obj)
-      allow(github_repo).to receive(:octo).and_return(@octo_obj)
-      allow(github_repo).to receive(:func_disabled?).and_return(false)
-      allow(github_repo).to receive(:repo?).and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:config).and_return(conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).and_return(true)
     end
 
     context 'when valid inputs provided, and all things work out' do
@@ -626,7 +630,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
 
     context 'when function disabled' do
-      before { allow(github_repo).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh repo update homepage lita-test https://test.it')
@@ -635,7 +641,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
 
     context 'when repo not found' do
-      before { allow(github_repo).to receive(:repo?).and_return(false) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).and_return(false)
+      end
 
       it 'should return the repo not found error' do
         send_command('gh repo update homepage lita-test https://test.it')
@@ -685,7 +693,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       }
       pr = [nil, nil, nil, nil, nil]
       @octo_obj = double('Octokit::Client', repository: repo, pull_requests: pr)
-      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:octo).and_return(@octo_obj)
     end
 
     it 'should return some repo info' do
@@ -699,9 +707,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   describe '.repo_delete' do
     before do
-      allow(github_repo).to receive(:func_disabled?).and_return(false)
-      allow(github_repo).to receive(:delete_repo).and_return('hello there')
-      allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:delete_repo).and_return('hello there')
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
     end
 
     it 'reply with the return from delete_repo()' do
@@ -711,7 +719,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when command disabled' do
       before do
-        allow(github_repo).to receive(:func_disabled?).and_return(true)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(true)
       end
 
       it 'should no-op and say such if the command is disabled' do
@@ -722,7 +730,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when repo not found' do
       before do
-        allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
       end
 
       it 'should no-op informing you that the repo is not there' do
@@ -735,15 +743,15 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   describe '.repo_create' do
     before do
       @opts = { private: true, team_id: 42, organization: github_org }
-      allow(github_repo).to receive(:func_disabled?).and_return(false)
-      allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
-      allow(github_repo).to receive(:extrapolate_create_opts).and_return(@opts)
-      allow(github_repo).to receive(:create_repo).and_return('hello from PAX prime!')
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:extrapolate_create_opts).and_return(@opts)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:create_repo).and_return('hello from PAX prime!')
     end
 
     context 'when command disabled' do
       before do
-        allow(github_repo).to receive(:func_disabled?).and_return(true)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(true)
       end
 
       it 'should no-op and say such if the command is disabled' do
@@ -754,7 +762,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when repo already exists' do
       before do
-        allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
       end
 
       it 'should tell you it already exists' do
@@ -765,11 +773,11 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when repo does not exist' do
       before do
-        allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
       end
 
       it 'should reply with the return of create_repo()' do
-        expect(github_repo).to receive(:extrapolate_create_opts).and_return(@opts)
+        expect_any_instance_of(Lita::Handlers::GithubRepo).to receive(:extrapolate_create_opts).and_return(@opts)
         send_command("gh repo create #{github_org}/lita-test")
         expect(replies.last).to eql 'hello from PAX prime!'
       end
@@ -778,9 +786,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   describe '.repo_rename' do
     before do
-      allow(github_repo).to receive(:func_disabled?).and_return(false)
-      allow(github_repo).to receive(:rename_repo).and_return('hello there')
-      allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:rename_repo).and_return('hello there')
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
     end
 
     it 'reply with the return from rename_repo()' do
@@ -790,7 +798,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when command disabled' do
       before do
-        allow(github_repo).to receive(:func_disabled?).and_return(true)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:func_disabled?).and_return(true)
       end
 
       it 'should no-op and say such if the command is disabled' do
@@ -801,7 +809,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
     context 'when repo not found' do
       before do
-        allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
+        allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo?).with("#{github_org}/lita-test").and_return(false)
       end
 
       it 'should no-op informing you that the repo is not there' do
@@ -818,7 +826,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         { name: 'Everyone', slug: 'everyone', id: 42, permission: 'push' }
       ]
       @octo_obj = double('Octokit::Client', repository_teams: @teams)
-      allow(github_repo).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:octo).and_return(@octo_obj)
     end
 
     context 'when it finds a repo' do
@@ -853,11 +861,11 @@ Name: Interns, Slug: interns, ID: 84, Perms: pull
 
   describe '.repo_team_router' do
     before do
-      allow(github_repo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
     end
 
     it 'should call the method based on action and respond with its return' do
-      expect(github_repo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
+      expect_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo_team_add).with(an_instance_of(Lita::Response)).and_return('ohai')
       send_command("gh repo team add 42 #{github_org}/lita-test")
       expect(replies.last).to eql 'ohai'
     end
@@ -865,11 +873,11 @@ Name: Interns, Slug: interns, ID: 84, Perms: pull
 
   describe '.repo_update_router' do
     before do
-      allow(github_repo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
+      allow_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
     end
 
     it 'should call the method based on the action and respond with its return' do
-      expect(github_repo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
+      expect_any_instance_of(Lita::Handlers::GithubRepo).to receive(:repo_update_description).with(an_instance_of(Lita::Response)).and_return('ohai')
       send_command("gh repo update description #{github_org}/lita-test Something funky here")
       expect(replies.last).to eql 'ohai'
     end

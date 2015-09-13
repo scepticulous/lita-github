@@ -52,7 +52,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
   describe '.merge_pr' do
     before do
       @octo_obj = double('Octokit::Client', merge_pull_request: :ohai)
-      allow(github_pr).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
     end
 
     let(:pr_num) { 42 }
@@ -167,7 +167,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       @user_obj = { name: 'Tim Heckman' }
       @cs_obj = { state: 'success' }
       @octo_obj = double('Octokit::Client', user: @user_obj, combined_status: @cs_obj)
-      allow(github_pr).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
     end
 
     let(:pr_obj) do
@@ -217,7 +217,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     context 'when user has no name set' do
       before do
         @octo_obj = double('Octokit::Client', user: {}, combined_status: @cs_obj)
-        allow(github_pr).to receive(:octo).and_return(@octo_obj)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
       end
 
       it 'should not include the real name parenthesis' do
@@ -269,7 +269,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     before do
       @user_obj = { name: 'Tim Heckman' }
       @octo_obj = double('Octokit::Client', user: @user_obj)
-      allow(github_pr).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
     end
 
     let(:pr_obj) do
@@ -320,7 +320,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
         before do
           @user_obj = {}
           @octo_obj = double('Octokit::Client', user: @user_obj)
-          allow(github_pr).to receive(:octo).and_return(@octo_obj)
+          allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
         end
 
         it 'should set the :merged_by key without parenthesis' do
@@ -352,11 +352,11 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
 
   describe '.build_pr_info' do
     before do
-      allow(github_pr).to receive(:build_pr_header!).and_return(nil)
-      allow(github_pr).to receive(:build_pr_commitinfo!).and_return(nil)
-      allow(github_pr).to receive(:build_pr_status!).and_return(nil)
-      allow(github_pr).to receive(:build_pr_merge!).and_return(nil)
-      allow(github_pr).to receive(:build_pr_comments!).and_return(nil)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_header!).and_return(nil)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_commitinfo!).and_return(nil)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_status!).and_return(nil)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_merge!).and_return(nil)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_comments!).and_return(nil)
     end
 
     let(:pr_obj) { :ohai }
@@ -366,27 +366,27 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     end
 
     it 'should call .build_pr_header!' do
-      expect(github_pr).to receive(:build_pr_header!).with({}, pr_obj).and_return(nil)
+      expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_header!).with({}, pr_obj).and_return(nil)
       github_pr.send(:build_pr_info, pr_obj, full_name)
     end
 
     it 'should call .build_pr_commitinfo!' do
-      expect(github_pr).to receive(:build_pr_commitinfo!).with({}, pr_obj).and_return(nil)
+      expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_commitinfo!).with({}, pr_obj).and_return(nil)
       github_pr.send(:build_pr_info, pr_obj, full_name)
     end
 
     it 'should call .build_pr_status!' do
-      expect(github_pr).to receive(:build_pr_status!).with({}, pr_obj, full_name).and_return(nil)
+      expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_status!).with({}, pr_obj, full_name).and_return(nil)
       github_pr.send(:build_pr_info, pr_obj, full_name)
     end
 
     it 'should call .build_pr_merge!' do
-      expect(github_pr).to receive(:build_pr_merge!).with({}, pr_obj).and_return(nil)
+      expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_merge!).with({}, pr_obj).and_return(nil)
       github_pr.send(:build_pr_info, pr_obj, full_name)
     end
 
     it 'should call .build_pr_comments!' do
-      expect(github_pr).to receive(:build_pr_comments!).with({}, pr_obj).and_return(nil)
+      expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_comments!).with({}, pr_obj).and_return(nil)
       github_pr.send(:build_pr_info, pr_obj, full_name)
     end
   end
@@ -408,7 +408,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     before do
       @merge_status = { sha: 'abc456', merged: true, message: 'Pull Request successfully merged' }
       @octo_obj = double('Octokit::Client', merge_pull_request: @merge_status)
-      allow(github_pr).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
     end
 
     context 'when all goes well' do
@@ -423,7 +423,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
         @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
         @octo_obj = double('Octokit::Client')
         allow(@octo_obj).to receive(:merge_pull_request).and_raise(StandardError.new)
-        allow(github_pr).to receive(:octo).and_return(@octo_obj)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
       end
 
       it 'should return nil' do
@@ -445,8 +445,8 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
           review_comments: 2, comments: 1
         }
         @pr_resp = { fail: false, not_found: false, pr: @pr_info }
-        allow(github_pr).to receive(:pull_request).and_return(@pr_resp)
-        allow(github_pr).to receive(:build_pr_info).and_return(@pr_info)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:pull_request).and_return(@pr_resp)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_info).and_return(@pr_info)
       end
 
       it 'should reply with the expeced output' do
@@ -472,8 +472,8 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
           merged_by: 'theckman (Tim Heckman)', review_comments: 2, comments: 1
         }
         @pr_resp = { fail: false, not_found: false, pr: @pr_info }
-        allow(github_pr).to receive(:pull_request).and_return(@pr_resp)
-        allow(github_pr).to receive(:build_pr_info).and_return(@pr_info)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:pull_request).and_return(@pr_resp)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:build_pr_info).and_return(@pr_info)
       end
 
       it 'should reply with the expeced output' do
@@ -492,7 +492,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     context 'when the PR was not found' do
       before do
         @pr_resp = { fail: true, not_found: true, pr: @pr_info }
-        allow(github_pr).to receive(:pull_request).and_return(@pr_resp)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:pull_request).and_return(@pr_resp)
       end
 
       it 'should reply with the not found error' do
@@ -508,15 +508,15 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       @pr_obj =  { head: { ref: 'fix-some-bugs' }, title: 'fix bug' }
       @merge_status = { sha: 'abc456', merged: true, message: 'Pull Request successfully merged' }
       @octo_obj = double('Octokit::Client', pull_request: @pr_obj)
-      allow(github_pr).to receive(:octo).and_return(@octo_obj)
-      allow(github_pr).to receive(:func_disabled?).and_return(false)
-      allow(github_pr).to receive(:config).and_return(@cfg_obj)
-      allow(github_pr).to receive(:merge_pr).and_return(@merge_status)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:config).and_return(@cfg_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:merge_pr).and_return(@merge_status)
     end
 
     context 'when command disabled' do
       before do
-        allow(github_pr).to receive(:func_disabled?).and_return(true)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:func_disabled?).and_return(true)
       end
 
       it 'should no-op and say such' do
@@ -538,7 +538,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
 
     context 'when merging should succeed' do
       it 'should set the right commit message' do
-        expect(github_pr).to receive(:merge_pr).with(
+        expect_any_instance_of(Lita::Handlers::GithubPR).to receive(:merge_pr).with(
           'GrapeDuty', 'lita-test', '42', "Merge pull request #42 from GrapeDuty/fix-some-bugs\n\nfix bug"
         )
         send_command('shipit GrapeDuty/lita-test #42')
@@ -554,7 +554,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     context 'when merging bombs' do
       before do
         @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
-        allow(github_pr).to receive(:merge_pr).and_return(@merge_status)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:merge_pr).and_return(@merge_status)
       end
 
       it 'should confirm the failure' do
@@ -571,7 +571,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
       before do
         @merge_status = { sha: 'abc456', merged: false, message: '*BOOM*' }
         @octo_obj = double('Octokit::Client', pull_request: @pr_obj)
-        allow(github_pr).to receive(:merge_pr).and_return(nil)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:merge_pr).and_return(nil)
       end
 
       it 'should confirm the failure' do
@@ -589,8 +589,8 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
     before do
       cfg_obj = double('Lita::Configuration')
       octo_obj = double('Octokit::Client', pull_requests: [])
-      allow(github_pr).to receive(:octo).and_return(octo_obj)
-      allow(github_pr).to receive(:config).and_return(cfg_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:config).and_return(cfg_obj)
     end
 
     context 'when there are no pull requests' do
@@ -607,7 +607,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
           { title: 'Test1', number: 42, html_url: 'htmlurl', user: { login: 'theckman' } }
         ]
         octo_obj = double('Octokit::Client', pull_requests: pr)
-        allow(github_pr).to receive(:octo).and_return(octo_obj)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(octo_obj)
       end
 
       it 'should reply with the PRs' do
@@ -643,7 +643,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
           { title: 'Test1', number: 42, html_url: 'xxx', user: { login: 'theckman' } }
         ]
         octo_obj = double('Octokit::Client', pull_requests: pr)
-        allow(github_pr).to receive(:octo).and_return(octo_obj)
+        allow_any_instance_of(Lita::Handlers::GithubPR).to receive(:octo).and_return(octo_obj)
       end
 
       it 'should return the list of ten oldest & ten newest' do
