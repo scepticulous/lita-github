@@ -300,7 +300,7 @@ Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
     before do
       @secret = 'GZSDEMLDMY3TQYLG'
       conf_obj = double('Lita::Configuration', totp_secret: @secret)
-      allow(github).to receive(:config).and_return(conf_obj)
+      allow_any_instance_of(Lita::Handlers::Github).to receive(:config).and_return(conf_obj)
     end
 
     context 'when token is set' do
@@ -314,7 +314,7 @@ Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
     context 'when token is not set' do
       before do
         conf_obj = double('Lita::Configuration', totp_secret: nil)
-        allow(github).to receive(:config).and_return(conf_obj)
+        allow_any_instance_of(Lita::Handlers::Github).to receive(:config).and_return(conf_obj)
       end
 
       it 'should return the error message' do
@@ -344,15 +344,15 @@ Following: 20, Followers: 10, Joined: 2011-05-14 04:16:33 UTC'
       }
       @orgs = [{ login: 'PagerDuty' }, { login: 'GrapeDuty' }]
       @octo_obj = double('Octokit::Client', user: @user_obj, organizations: @orgs)
-      allow(github).to receive(:octo).and_return(@octo_obj)
-      allow(github).to receive(:whois_reply).and_return('StubbedResponse')
+      allow_any_instance_of(Lita::Handlers::Github).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::Github).to receive(:whois_reply).and_return('StubbedResponse')
     end
 
     context 'when all goes well' do
       it 'should return the response from whois_reply' do
         expect(@octo_obj).to receive(:user).with('theckman').and_return(@user_obj)
         expect(@octo_obj).to receive(:organizations).with('theckman').and_return(@orgs)
-        expect(github).to receive(:whois_reply).with(@user_obj, %w(PagerDuty GrapeDuty)).and_return('StubbedResponse')
+        allow_any_instance_of(Lita::Handlers::Github).to receive(:whois_reply).with(@user_obj, %w(PagerDuty GrapeDuty)).and_return('StubbedResponse')
         send_command('gh whois theckman')
         expect(replies.last).to eql 'StubbedResponse'
       end

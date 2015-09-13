@@ -135,8 +135,8 @@ describe Lita::Handlers::GithubOrg, lita_handler: true do
       ]
       conf_obj = double('Lita::Configuration', default_org: 'GrapeDuty')
       @octo_obj = double('Octokit::Client', organization_teams: @teams)
-      allow(github_org).to receive(:config).and_return(conf_obj)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:config).and_return(conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
     end
 
     context 'when provided a valid org' do
@@ -169,9 +169,9 @@ Name: HeckmanTest, Slug: heckmantest, ID: 42, Perms: push
       @octo_obj = double('Octokit::Client', create_team: @team)
       @perms = %w(pull push)
       @conf_obj = double('Lita::Config', org_team_add_allowed_perms: @perms)
-      allow(github_org).to receive(:config).and_return(@conf_obj)
-      allow(github_org).to receive(:func_disabled?).and_return(false)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:config).and_return(@conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
     end
 
     context 'when all goes well' do
@@ -184,7 +184,9 @@ Name: HeckmanTest, Slug: heckmantest, ID: 42, Perms: push
     end
 
     context 'when the method is disabled' do
-      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh org team add GrapeDuty name:"HeckmanTest" perms:pull')
@@ -231,10 +233,10 @@ Missing the perms option
     before do
       @team = { name: 'HeckmanTest', id: 42, slug: 'heckmantest', permission: 'pull' }
       @octo_obj = double('Octokit::Client', delete_team: true)
-      allow(github_org).to receive(:config).and_return(@conf_obj)
-      allow(github_org).to receive(:func_disabled?).and_return(false)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
-      allow(github_org).to receive(:team?).with('42').and_return(@team)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:config).and_return(@conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:team?).with('42').and_return(@team)
     end
 
     context 'when all goes well' do
@@ -245,7 +247,9 @@ Missing the perms option
     end
 
     context 'when the method is disabled' do
-      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh org team rm GrapeDuty 42')
@@ -254,7 +258,9 @@ Missing the perms option
     end
 
     context 'when the team does not exist' do
-      before { allow(github_org).to receive(:team?).with('42').and_return(false) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:team?).with('42').and_return(false)
+      end
 
       it 'should respond with the team not found error' do
         send_command('gh org team rm GrapeDuty 42')
@@ -289,9 +295,9 @@ Missing the perms option
       @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
       allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
       allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
-      allow(github_org).to receive(:func_disabled?).and_return(false)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
-      allow(github_org).to receive(:cofig).and_return(@conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:cofig).and_return(@conf_obj)
     end
 
     context 'when all goes well' do
@@ -302,7 +308,9 @@ Missing the perms option
     end
 
     context 'when the method is disabled' do
-      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh org eject GrapeDuty theckman')
@@ -368,10 +376,10 @@ Missing the perms option
       @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
       allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
       allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
-      allow(github_org).to receive(:func_disabled?).and_return(false)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
-      allow(github_org).to receive(:cofig).and_return(@conf_obj)
-      allow(github_org).to receive(:team_id).and_return(42)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:cofig).and_return(@conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:team_id).and_return(42)
     end
 
     context 'when all goes well' do
@@ -382,7 +390,9 @@ Missing the perms option
     end
 
     context 'when the method is disabled' do
-      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh org user add GrapeDuty heckmantest theckman')
@@ -448,10 +458,10 @@ Missing the perms option
       @conf_obj = double('Lita::Config', default_org: 'GrapeDuty')
       allow(@octo_obj).to receive(:user).with(no_args).and_return(@self_user)
       allow(@octo_obj).to receive(:user).with('theckman').and_return(@t_user)
-      allow(github_org).to receive(:func_disabled?).and_return(false)
-      allow(github_org).to receive(:octo).and_return(@octo_obj)
-      allow(github_org).to receive(:cofig).and_return(@conf_obj)
-      allow(github_org).to receive(:team_id).and_return(42)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(false)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:octo).and_return(@octo_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:cofig).and_return(@conf_obj)
+      allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:team_id).and_return(42)
     end
 
     context 'when all goes well' do
@@ -462,7 +472,9 @@ Missing the perms option
     end
 
     context 'when the method is disabled' do
-      before { allow(github_org).to receive(:func_disabled?).and_return(true) }
+      before do
+        allow_any_instance_of(Lita::Handlers::GithubOrg).to receive(:func_disabled?).and_return(true)
+      end
 
       it 'should return the method disabled error' do
         send_command('gh org user rm GrapeDuty heckmantest theckman')
