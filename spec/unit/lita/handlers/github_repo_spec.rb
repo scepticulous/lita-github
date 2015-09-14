@@ -158,6 +158,38 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
+  describe '.additional_teams' do
+    before do
+      allow(github_repo).to receive(:team_id_by_slug).and_return(88)
+    end
+
+    context 'when the additional_default_teams config option is set' do
+      before do
+        cfg_obj = double('Lita::Configuration', additional_default_teams: ['heckman', 'orwell'])
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return an array of team IDs' do
+        expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
+          .and_return(42)
+        expect(github_repo).to receive(:team_id_by_slug).with('orwell', 'GrapeDuty')
+          .and_return(84)
+        expect(github_repo.send(:additional_teams, github_org)).to eql [42, 84]
+      end
+    end
+
+    context 'when the additional_default_teams config option is not set' do
+      before do
+        cfg_obj = double('Lita::Configuration', additional_default_teams: [])
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return an empty array' do
+        expect(github_repo.send(:additional_teams, github_org)).to eql []
+      end
+    end
+  end
+
   describe '.extrapolate_create_opts' do
     before do
       @eco_opts = {}
@@ -261,10 +293,23 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
       end
 
-      it 'should confirm succesfful creation' do
+      it 'should confirm successful creation' do
         opts = { private: true, team_id: 42, organization: github_org }
         expect(github_repo.send(:create_repo, github_org, 'lita-test', opts))
           .to eql 'Created GrapeDuty/lita-test: https://github.com/GrapeDuty/lita-test'
+      end
+
+      context 'when additional default teams are given' do
+        before do
+          allow(github_repo).to receive(:additional_teams).and_return([42, 84])
+        end
+
+        it 'should add teams to the repo after creating it' do
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 42)
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 84)
+          opts = { private: true, team_id: 1, organization: github_org }
+          github_repo.send(:create_repo, github_org, 'lita-test', opts)
+        end
       end
     end
 

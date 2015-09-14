@@ -294,6 +294,10 @@ module Lita
         config.default_team_slug.nil? ? nil : team_id_by_slug(config.default_team_slug, org)
       end
 
+      def additional_teams(org)
+        config.additional_default_teams.map { |team| team_id_by_slug(team, org) }
+      end
+
       def should_repo_be_private?(value)
         if value.nil? || value.empty?
           config.repo_private_default
@@ -308,7 +312,7 @@ module Lita
           true
         when 'false'
           false
-        else # when some invalud value...
+        else # when some invalid value...
           config.repo_private_default
         end
       end
@@ -318,6 +322,9 @@ module Lita
         reply = nil
         begin
           octo.create_repository(repo, opts)
+          additional_teams(org).each do |team|
+            add_team_to_repo(full_name, team)
+          end
         ensure
           if repo?(full_name)
             repo_url = "https://github.com/#{full_name}"
