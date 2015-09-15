@@ -274,28 +274,40 @@ module Lita
         t('repo_update_homepage.updated', repo: full_name, url: resp[:homepage])
       end
 
+      # rubocop:disable Style/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
       def extrapolate_create_opts(opts, org)
         opts[:organization] = org
 
+        teams = default_teams(org)
+        first_team = teams.first
+        other_teams = teams[1..-1].reject(&:nil?) # Filter invalid team IDs
+
         if opts.key?(:team)
-          t_id = team_id_by_slug(opts[:team], org) || default_team(org)
+          t_id = team_id_by_slug(opts[:team], org) || first_team
           opts[:team_id] = t_id unless t_id.nil?
         else
-          t_id = default_team(org)
+          t_id = first_team
           opts[:team_id] = t_id unless t_id.nil?
+          opts[:other_teams] = other_teams unless other_teams.empty?
         end unless opts.key?(:team_id)
 
         opts[:private] = should_repo_be_private?(opts[:private])
 
         opts
       end
+      # rubocop:enable Style/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
 
-      def default_team(org)
-        config.default_team_slug.nil? ? nil : team_id_by_slug(config.default_team_slug, org)
-      end
-
-      def additional_teams(org)
-        config.additional_default_teams.map { |team| team_id_by_slug(team, org) }
+      def default_teams(org)
+        # If default_team_slug is defined, return it as the sole element in an array
+        return [team_id_by_slug(config.default_team_slug, org)] unless config.default_team_slug.nil?
+        # Otherwise, look at default_team_slugs
+        teams = config.default_team_slugs
+        # If it's either a non-array or an empty array, return an array containing nil
+        return [nil] if !teams.is_a?(Array) || teams.empty?
+        # If it's a populated array, return an array of corresponding team IDs
+        teams.map { |team| team_id_by_slug(team, org) }
       end
 
       def should_repo_be_private?(value)
@@ -322,9 +334,9 @@ module Lita
         reply = nil
         begin
           octo.create_repository(repo, opts)
-          additional_teams(org).each do |team|
+          opts[:other_teams].each do |team|
             add_team_to_repo(full_name, team)
-          end
+          end if opts.key?(:other_teams)
         ensure
           if repo?(full_name)
             repo_url = "https://github.com/#{full_name}"
