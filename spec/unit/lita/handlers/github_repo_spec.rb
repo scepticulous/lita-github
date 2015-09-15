@@ -133,9 +133,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       allow(github_repo).to receive(:team_id_by_slug).and_return(88)
     end
 
-    context 'when default_team_slug is set' do
+    context 'when default_team_slugs is set' do
       before do
-        cfg_obj = double('Lita::Configuration', default_team_slug: 'heckman')
+        cfg_obj = double('Lita::Configuration', default_team_slugs: ['heckman'])
         allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
@@ -146,74 +146,49 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
       end
     end
 
-    context 'when default_team_slug is not set' do
-      context 'when default_team_slugs is not set' do
-        before do
-          cfg_obj = double(
-            'Lita::Configuration', default_team_slug: nil, default_team_slugs: nil)
-          allow(github_repo).to receive(:config).and_return(cfg_obj)
-        end
-
-        it 'should return [nil]' do
-          expect(github_repo.send(:default_teams, github_org)).to eql [nil]
-        end
+    context 'when default_team_slugs is not set' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slugs: nil)
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
-      context 'when default_team_slugs is an empty array' do
-        before do
-          cfg_obj = double(
-            'Lita::Configuration', default_team_slug: nil, default_team_slugs: [])
-          allow(github_repo).to receive(:config).and_return(cfg_obj)
-        end
+      it 'should return [nil]' do
+        expect(github_repo.send(:default_teams, github_org)).to eql [nil]
+      end
+    end
 
-        it 'should return [nil]' do
-          expect(github_repo.send(:default_teams, github_org)).to eql [nil]
-        end
+    context 'when default_team_slugs is an empty array' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slugs: [])
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
-      context 'when default_team_slugs is set to an array with 1 element' do
-        before do
-          cfg_obj = double(
-            'Lita::Configuration',
-            default_team_slug: nil,
-            default_team_slugs: ['heckman']
-          )
-          allow(github_repo).to receive(:config).and_return(cfg_obj)
-        end
+      it 'should return [nil]' do
+        expect(github_repo.send(:default_teams, github_org)).to eql [nil]
+      end
+    end
 
-        it 'should return an array containing the corresponding team ID' do
-          expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
-            .and_return(42)
-          expect(github_repo.send(:default_teams, github_org)).to eql [42]
-        end
+    context 'when default_team_slugs is set to an array with multiple elements' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slugs: %w(heckman orwell))
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
-      context 'when default_team_slugs is set to an array with multiple elements' do
-        before do
-          cfg_obj = double(
-            'Lita::Configuration',
-            default_team_slug: nil,
-            default_team_slugs: %w(heckman orwell)
-          )
-          allow(github_repo).to receive(:config).and_return(cfg_obj)
-        end
-
-        it 'should return an array containing the corresponding team IDs' do
-          expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
-            .and_return(42)
-          expect(github_repo).to receive(:team_id_by_slug).with('orwell', 'GrapeDuty')
-            .and_return(84)
-          expect(github_repo.send(:default_teams, github_org)).to eql [42, 84]
-        end
+      it 'should return an array containing the corresponding team IDs' do
+        expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
+          .and_return(42)
+        expect(github_repo).to receive(:team_id_by_slug).with('orwell', 'GrapeDuty')
+          .and_return(84)
+        expect(github_repo.send(:default_teams, github_org)).to eql [42, 84]
       end
     end
   end
 
   describe '.extrapolate_create_opts' do
-    context 'when default_team_slug is set' do
+    context 'when default_team_slugs is set' do
       before do
         @eco_opts = {}
-        @c_obj = double('Lita::Configuration', default_team_slug: 'h3ckman')
+        @c_obj = double('Lita::Configuration', default_team_slugs: ['h3ckman'])
         allow(github_repo).to receive(:config).and_return(@c_obj)
         allow(github_repo).to receive(:team_id_by_slug).and_return(42)
         allow(github_repo).to receive(:should_repo_be_private?).and_return(true)
@@ -242,7 +217,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
         context 'when default_teams returns [nil]' do
           before do
-            @c_obj = double('Lita::Configuration', default_team_slug: nil)
+            @c_obj = double('Lita::Configuration', default_team_slugs: nil)
             allow(github_repo).to receive(:config).and_return(@c_obj)
           end
 
@@ -277,7 +252,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
           context 'when there is no default slug set' do
             before do
               @eco_opts = { team: 'h3ckman', private: true }
-              c_obj = double('Lita::Configuration', default_team_slug: nil, default_team_slugs: nil)
+              c_obj = double('Lita::Configuration', default_team_slugs: nil)
               allow(github_repo).to receive(:config).and_return(c_obj)
             end
 

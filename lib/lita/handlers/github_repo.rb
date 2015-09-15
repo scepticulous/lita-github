@@ -300,11 +300,9 @@ module Lita
       # rubocop:enable Metrics/PerceivedComplexity
 
       def default_teams(org)
-        # If default_team_slug is defined, return it as the sole element in an array
-        return [team_id_by_slug(config.default_team_slug, org)] unless config.default_team_slug.nil?
-        # Otherwise, look at default_team_slugs
         teams = config.default_team_slugs
-        # If it's either a non-array or an empty array, return an array containing nil
+        # If default_team_slugs is either a non-array (e.g. nil) or an empty
+        # array, return an array containing nil
         return [nil] if !teams.is_a?(Array) || teams.empty?
         # If it's a populated array, return an array of corresponding team IDs
         teams.map { |team| team_id_by_slug(team, org) }
