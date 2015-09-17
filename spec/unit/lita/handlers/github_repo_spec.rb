@@ -358,7 +358,8 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
           expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', { id: 42, name: 'heckman' })
           expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', { id: 84, name: 'orwell' })
           opts = { private: true, team_id: 1, other_teams: [42, 84], organization: github_org }
-          github_repo.send(:create_repo, github_org, 'lita-test', opts)
+          expect(github_repo.send(:create_repo, github_org, 'lita-test', opts))
+            .to eql 'Created GrapeDuty/lita-test: https://github.com/GrapeDuty/lita-test'
         end
       end
     end
