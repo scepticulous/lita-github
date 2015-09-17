@@ -68,7 +68,7 @@ module Lita
       def self.default_config(config)
         # when setting default configuration values please remember one thing:
         # secure and safe by default
-        config.default_team_slug          = nil
+        config.default_team_slugs         = nil
         config.repo_private_default       = true
         config.org_team_add_allowed_perms = %w(pull)
 

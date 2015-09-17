@@ -128,125 +128,208 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
     end
   end
 
-  describe '.default_team' do
+  describe '.default_teams' do
     before do
       allow(github_repo).to receive(:team_id_by_slug).and_return(88)
     end
 
-    context 'when the default team slug is set' do
+    context 'when default_team_slugs is set' do
       before do
-        cfg_obj = double('Lita::Configuration', default_team_slug: 'heckman')
+        cfg_obj = double('Lita::Configuration', default_team_slugs: ['heckman'])
         allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
-      it 'should return the team ID of the slug' do
+      it 'should return an array containing the team ID of the slug' do
         expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
           .and_return(42)
-        expect(github_repo.send(:default_team, github_org)).to eql 42
+        expect(github_repo.send(:default_teams, github_org)).to eql [42]
       end
     end
 
-    context 'when the default slug is not set' do
+    context 'when default_team_slugs is not set' do
       before do
-        cfg_obj = double('Lita::Configuration', default_team_slug: nil)
+        cfg_obj = double('Lita::Configuration', default_team_slugs: nil)
         allow(github_repo).to receive(:config).and_return(cfg_obj)
       end
 
-      it 'should return nil' do
-        expect(github_repo.send(:default_team, github_org)).to be_nil
+      it 'should return [nil]' do
+        expect(github_repo.send(:default_teams, github_org)).to eql [nil]
+      end
+    end
+
+    context 'when default_team_slugs is an empty array' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slugs: [])
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return [nil]' do
+        expect(github_repo.send(:default_teams, github_org)).to eql [nil]
+      end
+    end
+
+    context 'when default_team_slugs is set to an array with multiple elements' do
+      before do
+        cfg_obj = double('Lita::Configuration', default_team_slugs: %w(heckman orwell))
+        allow(github_repo).to receive(:config).and_return(cfg_obj)
+      end
+
+      it 'should return an array containing the corresponding team IDs' do
+        expect(github_repo).to receive(:team_id_by_slug).with('heckman', 'GrapeDuty')
+          .and_return(42)
+        expect(github_repo).to receive(:team_id_by_slug).with('orwell', 'GrapeDuty')
+          .and_return(84)
+        expect(github_repo.send(:default_teams, github_org)).to eql [42, 84]
       end
     end
   end
 
   describe '.extrapolate_create_opts' do
-    before do
-      @eco_opts = {}
-      @c_obj = double('Lita::Configuration', default_team_slug: 'h3ckman')
-      allow(github_repo).to receive(:config).and_return(@c_obj)
-      allow(github_repo).to receive(:team_id_by_slug).and_return(42)
-      allow(github_repo).to receive(:should_repo_be_private?).and_return(true)
-    end
-
-    it 'should set the :organization key, :team_id key, and :private key' do
-      h = { organization: github_org, team_id: 42, private: true }
-      expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-    end
-
-    it 'should set the private key to the return of should_repo_be_private?' do
-      opts = { private: 'test', team_id: 42 }
-      expect(github_repo).to receive(:should_repo_be_private?).with('test').and_return :ohai
-      r = github_repo.send(:extrapolate_create_opts, opts, github_org)
-      expect(r[:private]).to eql :ohai
-    end
-
-    context 'when there is no :team set' do
-      context 'when default_team returns a team id' do
-        it 'should get the default team_id' do
-          h = { organization: github_org, team_id: 44, private: true }
-          expect(github_repo).to receive(:default_team).with(github_org).and_return(44)
-          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-        end
+    context 'when default_team_slugs is set' do
+      before do
+        @eco_opts = {}
+        @c_obj = double('Lita::Configuration', default_team_slugs: ['h3ckman'])
+        allow(github_repo).to receive(:config).and_return(@c_obj)
+        allow(github_repo).to receive(:team_id_by_slug).and_return(42)
+        allow(github_repo).to receive(:should_repo_be_private?).and_return(true)
       end
 
-      context 'when default_team returns nil' do
-        before do
-          @c_obj = double('Lita::Configuration', default_team_slug: nil)
-          allow(github_repo).to receive(:config).and_return(@c_obj)
-        end
-
-        it 'should not set the :team_id key' do
-          h = { organization: github_org, private: true }
-          expect(github_repo).to receive(:default_team).with(github_org).and_return(nil)
-          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-        end
-      end
-    end
-
-    context 'when options contains :team and no :team_id' do
-      context 'when given a valid slug' do
-        before { @eco_opts = { team: 'heckman' } }
-
-        it 'should set the :team_id key' do
-          h = { organization: github_org, team_id: 84, private: true }.merge!(@eco_opts)
-          expect(github_repo).to receive(:team_id_by_slug).with('heckman', github_org).and_return(84)
-          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-        end
-      end
-
-      context 'when given an invalid slug' do
-        context 'when there is a default slug set' do
-          it 'should set the team to the default' do
-            h = { organization: github_org, team_id: 42, private: true }.merge!(@eco_opts)
-            expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org).and_return(42)
-            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-          end
-        end
-
-        context 'when there is no default slug set' do
-          before do
-            @eco_opts = { team: 'h3ckman', private: true }
-            c_obj = double('Lita::Configuration', default_team_slug: nil)
-            allow(github_repo).to receive(:config).and_return(c_obj)
-          end
-
-          it 'should not set a :team_id' do
-            h = { organization: github_org }.merge!(@eco_opts)
-            expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org)
-              .and_return(nil)
-            expect(github_repo).to receive(:default_team).with(github_org).and_call_original
-            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
-          end
-        end
-      end
-    end
-
-    context 'when there is a :team_id key' do
-      before { @eco_opts = { team_id: 44, private: true } }
-
-      it 'should just leave it alone...' do
-        h = { organization: github_org }.merge!(@eco_opts)
-        expect(github_repo).not_to receive(:team_id_by_slug)
+      it 'should set the :organization key, :team_id key, and :private key' do
+        h = { organization: github_org, team_id: 42, private: true }
         expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+      end
+
+      it 'should set the private key to the return of should_repo_be_private?' do
+        opts = { private: 'test', team_id: 42 }
+        expect(github_repo).to receive(:should_repo_be_private?).with('test').and_return :ohai
+        r = github_repo.send(:extrapolate_create_opts, opts, github_org)
+        expect(r[:private]).to eql :ohai
+      end
+
+      context 'when there is no :team set' do
+        context 'when default_teams returns an array containing a team id' do
+          it 'should get the default team_id' do
+            h = { organization: github_org, team_id: 44, private: true }
+            expect(github_repo).to receive(:default_teams).with(github_org).and_return([44])
+            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+          end
+        end
+
+        context 'when default_teams returns [nil]' do
+          before do
+            @c_obj = double('Lita::Configuration', default_team_slugs: nil)
+            allow(github_repo).to receive(:config).and_return(@c_obj)
+          end
+
+          it 'should not set the :team_id key' do
+            h = { organization: github_org, private: true }
+            expect(github_repo).to receive(:default_teams).with(github_org).and_return([nil])
+            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+          end
+        end
+      end
+
+      context 'when options contains :team and no :team_id' do
+        context 'when given a valid slug' do
+          before { @eco_opts = { team: 'heckman' } }
+
+          it 'should set the :team_id key' do
+            h = { organization: github_org, team_id: 84, private: true }.merge!(@eco_opts)
+            expect(github_repo).to receive(:team_id_by_slug).with('heckman', github_org).and_return(84)
+            expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+          end
+        end
+
+        context 'when given an invalid slug' do
+          context 'when there is a default slug set' do
+            it 'should set the team to the default' do
+              h = { organization: github_org, team_id: 42, private: true }.merge!(@eco_opts)
+              expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org).and_return(42)
+              expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+            end
+          end
+
+          context 'when there is no default slug set' do
+            before do
+              @eco_opts = { team: 'h3ckman', private: true }
+              c_obj = double('Lita::Configuration', default_team_slugs: nil)
+              allow(github_repo).to receive(:config).and_return(c_obj)
+            end
+
+            it 'should not set a :team_id' do
+              h = { organization: github_org }.merge!(@eco_opts)
+              expect(github_repo).to receive(:team_id_by_slug).with('h3ckman', github_org)
+                .and_return(nil)
+              expect(github_repo).to receive(:default_teams).with(github_org).and_call_original
+              expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+            end
+          end
+        end
+      end
+
+      context 'when there is a :team_id key' do
+        before { @eco_opts = { team_id: 44, private: true } }
+
+        it 'should just leave it alone...' do
+          h = { organization: github_org }.merge!(@eco_opts)
+          expect(github_repo.send(:extrapolate_create_opts, @eco_opts, github_org)).to eql h
+        end
+      end
+    end
+
+    context 'with an array of default teams' do
+      before do
+        allow(github_repo).to receive(:should_repo_be_private?).and_return(true)
+      end
+
+      context 'consisting of a nil element' do
+        before do
+          allow(github_repo).to receive(:default_teams).with(github_org).and_return([nil])
+        end
+
+        it 'does not set :team_id' do
+          expect(github_repo.send(:extrapolate_create_opts, { private: true }, github_org)).to eql(organization: github_org, private: true)
+        end
+      end
+
+      context 'consisting of one valid team ID' do
+        before do
+          allow(github_repo).to receive(:default_teams).with(github_org).and_return([42])
+        end
+
+        it 'sets :team_id' do
+          expect(github_repo.send(:extrapolate_create_opts, { private: true }, github_org)).to eql(organization: github_org, team_id: 42, private: true)
+        end
+      end
+
+      context 'consisting of two valid team IDs' do
+        before do
+          allow(github_repo).to receive(:default_teams).with(github_org).and_return([42, 84])
+        end
+
+        it 'sets :team_id and :other_teams' do
+          expect(github_repo.send(:extrapolate_create_opts, { private: true }, github_org)).to eql(organization: github_org, team_id: 42, other_teams: [84], private: true)
+        end
+      end
+
+      context 'consisting of three valid team IDs' do
+        before do
+          allow(github_repo).to receive(:default_teams).with(github_org).and_return([42, 84, 1])
+        end
+
+        it 'sets :team_id and :other_teams' do
+          expect(github_repo.send(:extrapolate_create_opts, { private: true }, github_org)).to eql(organization: github_org, team_id: 42, other_teams: [84, 1], private: true)
+        end
+      end
+
+      context 'consisting of one valid team ID and one invalid team ID' do
+        before do
+          allow(github_repo).to receive(:default_teams).with(github_org).and_return([42, nil])
+        end
+
+        it 'sets :team_id but not :other_teams' do
+          expect(github_repo.send(:extrapolate_create_opts, { private: true }, github_org)).to eql(organization: github_org, team_id: 42, private: true)
+        end
       end
     end
   end
@@ -261,10 +344,19 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
         allow(github_repo).to receive(:repo?).with("#{github_org}/lita-test").and_return(true)
       end
 
-      it 'should confirm succesfful creation' do
+      it 'should confirm successful creation' do
         opts = { private: true, team_id: 42, organization: github_org }
         expect(github_repo.send(:create_repo, github_org, 'lita-test', opts))
           .to eql 'Created GrapeDuty/lita-test: https://github.com/GrapeDuty/lita-test'
+      end
+
+      context 'when other teams are given' do
+        it 'should add teams to the repo after creating it' do
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 42)
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 84)
+          opts = { private: true, team_id: 1, other_teams: [42, 84], organization: github_org }
+          github_repo.send(:create_repo, github_org, 'lita-test', opts)
+        end
       end
     end
 

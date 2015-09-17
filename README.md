@@ -22,14 +22,14 @@ Configuration
 The configuration options will get their own in-depth doc a little further down the line. Here are the important ones for now:
 
 * `config.handlers.github.access_token = ''`
-  * Your GitHUb access token (generated from Settings > Security > Personal Applications)
+  * Your GitHub access token (generated from Settings > Security > Personal Applications)
   * This is an administrative utility, so the token will need pretty wide access to leverage this plugin fully
 * `config.handlers.github.default_org = ''`
   * Your company may only have one organization, the handler will allow you to type just the repo name (`lita-github`) instead of `PagerDuty/lita-github`.
-* `config.handlers.github.default_team_slug = ''`
-  * if no team is provided when adding a repo, it uses this team by default -- if unset, only owners can access repo
-  * the default team that should be added to a repo based on the slug name:
-    * When clicking on a team in your org you can use the URL to get the slug: https://github.com/orgs/<ORG>/teams/[slug]
+  * `config.handlers.github.default_team_slugs = ['']`
+    * if no team is provided when adding a repo, it uses these teams by default -- if unset, only owners can access repo
+    * the default teams that should be added to a repo based on the slug name:
+      * When clicking on a team in your org you can use the URL to get the slug: https://github.com/orgs/<ORG>/teams/[slug]
 
 Commands
 --------

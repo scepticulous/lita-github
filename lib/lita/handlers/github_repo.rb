@@ -277,11 +277,14 @@ module Lita
       def extrapolate_create_opts(opts, org)
         opts[:organization] = org
 
-        if opts.key?(:team)
-          t_id = team_id_by_slug(opts[:team], org) || default_team(org)
-          opts[:team_id] = t_id unless t_id.nil?
-        else
-          t_id = default_team(org)
+        first_team, other_teams = filter_teams(default_teams(org))
+
+        begin
+          t_id = team_id_by_slug(opts.fetch(:team), org)
+        rescue KeyError
+          t_id = first_team
+          opts[:other_teams] = other_teams unless other_teams.empty?
+        ensure
           opts[:team_id] = t_id unless t_id.nil?
         end unless opts.key?(:team_id)
 
@@ -290,8 +293,17 @@ module Lita
         opts
       end
 
-      def default_team(org)
-        config.default_team_slug.nil? ? nil : team_id_by_slug(config.default_team_slug, org)
+      def filter_teams(teams)
+        [teams.first, teams[1..-1].reject(&:nil?)] # Filter invalid team IDs
+      end
+
+      def default_teams(org)
+        teams = config.default_team_slugs
+        # If default_team_slugs is either a non-array (e.g. nil) or an empty
+        # array, return an array containing nil
+        return [nil] if !teams.is_a?(Array) || teams.empty?
+        # If it's a populated array, return an array of corresponding team IDs
+        teams.map { |team| team_id_by_slug(team, org) }
       end
 
       def should_repo_be_private?(value)
@@ -308,7 +320,7 @@ module Lita
           true
         when 'false'
           false
-        else # when some invalud value...
+        else # when some invalid value...
           config.repo_private_default
         end
       end
@@ -318,6 +330,9 @@ module Lita
         reply = nil
         begin
           octo.create_repository(repo, opts)
+          opts[:other_teams].each do |team|
+            add_team_to_repo(full_name, team)
+          end if opts.key?(:other_teams)
         ensure
           if repo?(full_name)
             repo_url = "https://github.com/#{full_name}"
