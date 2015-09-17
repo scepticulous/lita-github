@@ -277,7 +277,7 @@ module Lita
       def extrapolate_create_opts(opts, org)
         opts[:organization] = org
 
-        first_team, other_teams = filter_teams default_teams(org)
+        first_team, other_teams = filter_teams(default_teams(org))
 
         begin
           t_id = team_id_by_slug(opts.fetch(:team), org)
