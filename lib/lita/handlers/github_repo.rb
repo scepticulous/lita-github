@@ -274,30 +274,28 @@ module Lita
         t('repo_update_homepage.updated', repo: full_name, url: resp[:homepage])
       end
 
-      # rubocop:disable Style/CyclomaticComplexity
-      # rubocop:disable Metrics/PerceivedComplexity
       def extrapolate_create_opts(opts, org)
         opts[:organization] = org
 
-        teams = default_teams(org)
-        first_team = teams.first
-        other_teams = teams[1..-1].reject(&:nil?) # Filter invalid team IDs
+        first_team, other_teams = filter_teams default_teams(org)
 
-        if opts.key?(:team)
-          t_id = team_id_by_slug(opts[:team], org) || first_team
-          opts[:team_id] = t_id unless t_id.nil?
-        else
+        begin
+          t_id = team_id_by_slug(opts.fetch(:team), org)
+        rescue KeyError
           t_id = first_team
-          opts[:team_id] = t_id unless t_id.nil?
           opts[:other_teams] = other_teams unless other_teams.empty?
+        ensure
+          opts[:team_id] = t_id unless t_id.nil?
         end unless opts.key?(:team_id)
 
         opts[:private] = should_repo_be_private?(opts[:private])
 
         opts
       end
-      # rubocop:enable Style/CyclomaticComplexity
-      # rubocop:enable Metrics/PerceivedComplexity
+
+      def filter_teams(teams)
+        [teams.first, teams[1..-1].reject(&:nil?)] # Filter invalid team IDs
+      end
 
       def default_teams(org)
         teams = config.default_team_slugs
