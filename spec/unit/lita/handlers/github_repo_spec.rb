@@ -336,7 +336,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   describe '.create_repo' do
     before do
-      allow(github_repo).to receive(:octo).and_return(double('Octokit::Client', create_repository: nil))
+      allow(github_repo).to receive(:octo).and_return(double('Octokit::Client', create_repository: nil, team: {}))
     end
 
     context 'when repo created' do
