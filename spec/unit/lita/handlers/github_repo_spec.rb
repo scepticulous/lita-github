@@ -336,7 +336,9 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   describe '.create_repo' do
     before do
-      allow(github_repo).to receive(:octo).and_return(double('Octokit::Client', create_repository: nil))
+      client = double('Octokit::Client', create_repository: nil)
+      allow(github_repo).to receive(:octo).and_return(client)
+      allow(client).to receive(:team).exactly(2).times.and_return({ id: 42, name: 'heckman' }, { id: 84, name: 'orwell' })
     end
 
     context 'when repo created' do
@@ -352,10 +354,11 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
       context 'when other teams are given' do
         it 'should add teams to the repo after creating it' do
-          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 42)
-          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', 84)
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', { id: 42, name: 'heckman' })
+          expect(github_repo).to receive(:add_team_to_repo).with('GrapeDuty/lita-test', { id: 84, name: 'orwell' })
           opts = { private: true, team_id: 1, other_teams: [42, 84], organization: github_org }
-          github_repo.send(:create_repo, github_org, 'lita-test', opts)
+          expect(github_repo.send(:create_repo, github_org, 'lita-test', opts))
+            .to eql 'Created GrapeDuty/lita-test: https://github.com/GrapeDuty/lita-test'
         end
       end
     end

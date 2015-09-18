@@ -330,8 +330,8 @@ module Lita
         reply = nil
         begin
           octo.create_repository(repo, opts)
-          opts[:other_teams].each do |team|
-            add_team_to_repo(full_name, team)
+          opts[:other_teams].each do |team_id|
+            add_team_to_repo(full_name, gh_team(org, team_id))
           end if opts.key?(:other_teams)
         ensure
           if repo?(full_name)
