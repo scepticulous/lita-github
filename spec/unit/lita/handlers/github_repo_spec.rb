@@ -336,9 +336,8 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
 
   describe '.create_repo' do
     before do
-      client = double('Octokit::Client')
+      client = double('Octokit::Client', create_repository: nil)
       allow(github_repo).to receive(:octo).and_return(client)
-      allow(client).to receive(:create_repository).and_return(nil)
       allow(client).to receive(:team).exactly(2).times.and_return({ id: 42, name: 'heckman' }, { id: 84, name: 'orwell' })
     end
 
