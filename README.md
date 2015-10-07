@@ -29,7 +29,7 @@ The configuration options will get their own in-depth doc a little further down 
 * `config.handlers.github.default_team_slugs = ['']`
   * if no team is provided when adding a repo, it uses these teams by default -- if unset, only owners can access repo
   * the default teams that should be added to a repo based on the slug name:
-    * When clicking on a team in your org you can use the URL to get the slug: https://github.com/orgs/<ORG>/teams/[slug]
+    * When clicking on a team in your org you can use the URL to get the slug: `https://github.com/orgs/<ORG>/teams/[slug]`
 
 Commands
 --------
