@@ -24,7 +24,7 @@ module LitaGithub
 
     # option regex, letting you scan the string for things like:
     #  key1:value key2:"value2" key3:'a better value'
-    OPT_REGEX ||= /((?:\s+?[a-zA-Z0-9_]+?):(?:(?:".+?")|(?:'.+?')|(?:[a-zA-Z0-9_]+)))/
+    OPT_REGEX ||= /((?:\s+?[a-zA-Z0-9_]+?):(?:(?:".+?")|(?:'.+?')|(?:[a-zA-Z0-9_\-]+)))/
 
     # regex matcher for a repo name (not including the org).
     REPO_NAME_REGEX = '(?<repo_name>[a-zA-Z0-9_\-]+)'

@@ -33,6 +33,13 @@ describe LitaGithub::General do
       expect(co[:string1]).to eql 'something here'
       expect(co[:string2]).to eql 'something else'
     end
+
+    it 'should should parse words with dashes' do
+      o = ' team:dash-team '
+      co = opts_parse(o)
+      expect(co).to be_an_instance_of Hash
+      expect(co[:team]).to eql 'dash-team'
+    end
   end
 
   describe '.to_i_if_numeric' do
