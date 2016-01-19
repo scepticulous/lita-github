@@ -51,7 +51,7 @@ describe Lita::Handlers::GithubOrg, lita_handler: true do
   it { is_expected.to route_command('gh org eject GrapeDuty theckman').to(:org_eject_user) }
   it { is_expected.to route_command('gh org eject theckman').to(:org_eject_user) }
 
-  let(:github_org) { Lita::Handlers::GithubOrg.new('robot') }
+  let(:github_org) { Lita::Handlers::GithubOrg.new(robot) }
   let(:disabled_err) { 'Sorry, this function has either been disabled or not enabled in the config' }
 
   ####

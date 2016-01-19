@@ -27,7 +27,7 @@ describe Lita::Handlers::GithubIssues, lita_handler: true do
 
   let(:gh_org) { 'GapeDuty' }
   let(:gh_repo) { 'lita-test' }
-  let(:github_issues) { Lita::Handlers::GithubIssues.new('robot') }
+  let(:github_issues) { Lita::Handlers::GithubIssues.new(robot) }
 
   describe '.validate_list_opts' do
     let(:good_opts) { { state: 'open', sort: 'updated', direction: 'asc' } }
