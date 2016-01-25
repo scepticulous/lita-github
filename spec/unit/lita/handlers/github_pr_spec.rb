@@ -33,7 +33,7 @@ describe Lita::Handlers::GithubPR, lita_handler: true do
   it { is_expected.to route_command('gh pr list GrapeDuty/lita-test').to(:pr_list) }
   it { is_expected.to route_command('gh pr list lita-test').to(:pr_list) }
 
-  let(:github_pr) { Lita::Handlers::GithubPR.new('robot') }
+  let(:github_pr) { Lita::Handlers::GithubPR.new(robot) }
   let(:github_org) { 'GrapeDuty' }
   let(:github_repo) { 'lita-test' }
   let(:full_name) { "#{github_org}/#{github_repo}" }

@@ -17,7 +17,7 @@
 require 'spec_helper'
 
 describe Lita::Handlers::Github, lita_handler: true do
-  let(:github) { Lita::Handlers::Github.new('robot') }
+  let(:github) { Lita::Handlers::Github.new(robot) }
 
   # status routing
   it { is_expected.to route_command('gh status').to(:status) }
@@ -33,9 +33,9 @@ describe Lita::Handlers::Github, lita_handler: true do
   it { is_expected.to route_command('gh whois theckman').to(:whois) }
   it { is_expected.to route_command('gh user theckman').to(:whois) }
 
-  describe '#default_config' do
-    it 'should set default team to nil' do
-      expect(Lita.config.handlers.github.default_team_slug).to be_nil
+  describe '#config' do
+    it 'should set default teams to nil' do
+      expect(Lita.config.handlers.github.default_team_slugs).to be_nil
     end
 
     it 'should set repos to private by default' do

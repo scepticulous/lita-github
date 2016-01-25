@@ -76,7 +76,7 @@ describe Lita::Handlers::GithubRepo, lita_handler: true do
   it { is_expected.to route_command('gh repo update description GrapeDuty/lita-test Some description here').to(:repo_update_router) }
   it { is_expected.to route_command('gh repo update description lita-test Some description here').to(:repo_update_router) }
 
-  let(:github_repo) { Lita::Handlers::GithubRepo.new('robot') }
+  let(:github_repo) { Lita::Handlers::GithubRepo.new(robot) }
   let(:github_org) { 'GrapeDuty' }
   let(:disabled_reply) { 'Sorry, this function has either been disabled or not enabled in the config' }
 

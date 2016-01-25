@@ -65,39 +65,39 @@ module Lita
         }
       )
 
-      def self.default_config(config)
-        # when setting default configuration values please remember one thing:
-        # secure and safe by default
-        config.default_team_slugs         = nil
-        config.repo_private_default       = true
-        config.org_team_add_allowed_perms = %w(pull)
+      # when setting default configuration values please remember one thing:
+      # secure and safe by default
+      config :access_token, default: nil
+      config :default_team_slugs, default: nil
+      config :repo_private_default, default: true
+      config :org_team_add_allowed_perms, default: %w(pull)
 
-        ####
-        # Method Filters
-        ####
+      ####
+      # Method Filters
+      ####
 
-        # Lita::Handlers::Github
-        config.totp_secret = nil
+      # Lita::Handlers::Github
+      config :totp_secret, default: nil
 
-        # Lita::Handlers::GithubRepo
-        config.repo_create_enabled              = true
-        config.repo_rename_enabled              = true
-        config.repo_delete_enabled              = false
-        config.repo_team_add_enabled            = false
-        config.repo_team_rm_enabled             = false
-        config.repo_update_description_enabled  = true
-        config.repo_update_homepage_enabled     = true
+      # Lita::Handlers::GithubRepo
+      config :repo_create_enabled, default: true
+      config :repo_rename_enabled, default: true
+      config :repo_delete_enabled, default: false
+      config :repo_team_add_enabled, default: false
+      config :repo_team_rm_enabled, default: false
+      config :repo_update_description_enabled, default: true
+      config :repo_update_homepage_enabled, default: true
 
-        # Lita::Handlers::GithubPR
-        config.pr_merge_enabled = true
+      # Lita::Handlers::GithubPR
+      config :pr_merge_enabled, default: true
 
-        # Lita::Handlers::GithubOrg
-        config.org_team_add_enabled       = false
-        config.org_team_rm_enabled        = false
-        config.org_user_add_enabled       = false
-        config.org_user_rm_enabled        = false
-        config.org_eject_user_enabled     = false
-      end
+      # Lita::Handlers::GithubOrg
+      config :default_org, default: nil
+      config :org_team_add_enabled, default: false
+      config :org_team_rm_enabled, default: false
+      config :org_user_add_enabled, default: false
+      config :org_user_rm_enabled, default: false
+      config :org_eject_user_enabled, default: false
 
       def status(response)
         status = octo.github_status_last_message
