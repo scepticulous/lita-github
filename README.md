@@ -31,6 +31,16 @@ The configuration options will get their own in-depth doc a little further down 
   * the default teams that should be added to a repo based on the slug name:
     * When clicking on a team in your org you can use the URL to get the slug: `https://github.com/orgs/<ORG>/teams/[slug]`
 
+### Github Enterprise configuration
+To set your github enterprise hostname you have to directly [configure
+Octokit](https://github.com/octokit/octokit.rb#working-with-github-enterprise). All you have to do is add
+the following snippet to ``lita_config.rb``.
+```ruby
+Octokit.configure do |octo_config|
+  octo_config.api_endpoint = "https://<your-api-hostname>/api/v3/"
+end
+```
+
 Commands
 --------
 Use the source, Luke. We will try to keep this list up to date, but it will be inevitably deprecated by proper documentation.
